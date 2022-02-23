@@ -1,0 +1,30 @@
+.home-card {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  margin-top: -1px;
+}
+.home-card .home-card-child {
+  margin-right: 8px;
+  width: 124px;
+  height: 90px;
+  border: 2px solid #f3f0f0;
+}
+.home-card .ant-card-head {
+  padding: 0 30px;
+}
+.home-card .ant-card-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+.charts {
+  display: flex;
+  flex-direction: row;
+  margin-top: 5px;
+  overflow: hidden;
+}
+.charts .ant-card-body {
+  padding: 10px;
+}

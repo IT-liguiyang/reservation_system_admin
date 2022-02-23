@@ -1,0 +1,12 @@
+.submit-button {
+  position: absolute;
+  left: 43%;
+}
+.cancel-button {
+  position: absolute;
+  right: -43%;
+}
+.ant-form-item-with-help .ant-form-item-explain {
+  height: 0;
+  min-height: 30px;
+}
