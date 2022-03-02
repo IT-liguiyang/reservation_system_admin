@@ -13,6 +13,7 @@ import {
 import LinkButton from '../../components/link-button';
 import ShowOpenAreas from './show-open-areas';
 import ShowOpenTime from './show-open-time';
+import ShowContent from '../../utils/show-content';
 import { reqSchools, reqSearchSchools, reqDeleteSchool} from '../../api';
 import {PAGE_SIZE} from '../../utils/constants';
 
@@ -33,6 +34,9 @@ export default class School extends Component {
     isShowOpenTime: false, // 是否显示开放区域详情
     openAreasDetail:[],  // 开放区域详情
     openTimeDetail:[],  // 开放时间详情
+    isShowContent: false, // 是否显示内容详情
+    contentDetail:{},  // 内容详情
+    current_click_item:[] // 当前点击查看的一项
   };
   
   componentDidMount () {
@@ -69,6 +73,23 @@ export default class School extends Component {
     });
   }
 
+    /* 显示内容详情 */
+    showContent = (text, record) => {
+      console.log(text);
+      this.setState({
+        current_click_item: text,
+        contentDetail: record,
+        isShowContent: true
+      });
+    }
+  
+    /* 用于接收子组件返回的isShowContent状态 */
+    handleCloseShowContentModal = (isShowContent) => {
+      this.setState({
+        isShowContent
+      });
+    }
+
   /* 删除学校 */
   deleteSchool = (school) => {
     console.log(school);
@@ -90,20 +111,65 @@ export default class School extends Component {
     this.columns = [
       {
         title: '学校名称',
-        width: 200,
+        width: 180,
         dataIndex: 'school',
         render: school => school[1]
       },
       {
         title: '所在区域',
-        width: 80,
+        width: 70,
         dataIndex: 'school',
         render: school => school[0]
+      },
+      {
+        title: '联系电话',
+        width: 100,
+        dataIndex: 'telephone',
+      },
+      {
+        title: '学校图片',
+        width: 100,
+        dataIndex: 'image',
+        render: (text, record, index) => {
+          return (
+            <LinkButton onClick={ ()=>this.showContent(text, record, index) }>点击查看</LinkButton>
+          );
+        }
+      },
+      {
+        title: '学校介绍',
+        width: 100,
+        dataIndex: 'introduce',
+        render: (text, record, index) => {
+          return (
+            <LinkButton onClick={ ()=>this.showContent(text, record, index) }>点击查看</LinkButton>
+          );
+        }
       },
       {
         title: '学校地址',
         width: 200,
         dataIndex: 'address',
+      },
+      {
+        title: '交通指引',
+        width: 100,
+        dataIndex: 'traffic_guidance',
+        render: (text, record, index) => {
+          return (
+            <LinkButton onClick={ ()=>this.showContent(text, record, index) }>点击查看</LinkButton>
+          );
+        }
+      },
+      {
+        title: '预约须知',
+        width: 100,
+        dataIndex: 'reservation_notice',
+        render: (text, record, index) => {
+          return (
+            <LinkButton onClick={ ()=>this.showContent(text, record, index) }>点击查看</LinkButton>
+          );
+        }
       },
       {
         title: '开放区域',
@@ -172,7 +238,7 @@ export default class School extends Component {
   }
 
   render() {
-    const { isShowOpenAreas, openAreasDetail, isShowOpenTime, openTimeDetail } = this.state;
+    const { isShowOpenAreas, openAreasDetail, isShowOpenTime, openTimeDetail, isShowContent, contentDetail, current_click_item } = this.state;
     this.initColumns();
 
     // 取出状态数据
@@ -222,6 +288,7 @@ export default class School extends Component {
         />
         <ShowOpenAreas openAreasDetail={openAreasDetail} handleCloseShowOpenAreasModal={this.handleCloseShowOpenAreasModal} isShowOpenAreas={isShowOpenAreas} />
         <ShowOpenTime openTimeDetail={openTimeDetail} handleCloseShowOpenTimeModal={this.handleCloseShowOpenTimeModal} isShowOpenTime={isShowOpenTime} />
+        <ShowContent contentDetail={contentDetail} current_click_item={current_click_item} handleCloseShowContentModal={this.handleCloseShowContentModal} isShowContent={isShowContent} />
       </Card>
     );
   }

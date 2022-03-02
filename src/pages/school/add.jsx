@@ -14,6 +14,9 @@ import {
 } from 'antd';
 
 import LinkButton from '../../components/link-button';
+import PicturesWall from '../../utils/pictures-wall';
+import RichTextEditor from '../../utils/rich-text-editor';
+
 import { reqAddSchool } from '../../api';
 import { SCHOOL_LIST} from '../../utils/school-list.js';
 
@@ -23,6 +26,10 @@ const SchoolAdd = (props) => {
   const [timeList] = useState([]);  // 创建开放时间对应的列表
 
   const formElement = useRef(null);
+
+  const image = React.createRef();  // 得到图片上传对象
+  const introduce = React.createRef();  // 得到 学校介绍 富文本输入框对象
+  const reservation_notice = React.createRef();  // 得到 预定须知 富文本输入框对象
 
   // 指定Form.Item布局的配置对象
   const formItemLayout = {
@@ -34,20 +41,24 @@ const SchoolAdd = (props) => {
   const title = (
     <span>
       <LinkButton onClick={() => this.props.history.goBack()}>
-        {/* <Icon type='arrow-left' style={{fontSize: 20}}/> */}
       </LinkButton>
       <span>添加学校</span>
     </span>
   );
 
   const AddSchool = async (values) => {
-    const { school, address, areaList } = values;
+    const { school, telephone, address, traffic_guidance, areaList } = values;
 
     console.log(school, address, areaList);
     // 1. 生成学校对象
     const schoolObj = {
       'school': school,
+      'telephone': telephone,
+      'image': image.current? image.current.getImgs():{},
+      'introduce': introduce.current? introduce.current.getDetail():{},
       'address': address,
+      'traffic_guidance': traffic_guidance,
+      'reservation_notice': reservation_notice.current? reservation_notice.current.getDetail():{},
       'open_areas': areaList,
       'open_time': [
         {
@@ -159,8 +170,11 @@ const SchoolAdd = (props) => {
    * [name]：作为对象的key，读取name的实际值
    */
   const timePicker = (name, value) => {
+    console.log(value[0]);
     timeList.push({ [name]: value[0].format('HH:mm') + '-' + value[1].format('HH:mm') });
   };
+
+  console.log('111111111', timeList);
 
   return (
     <Card title={title}>
@@ -184,6 +198,27 @@ const SchoolAdd = (props) => {
           />
         </Form.Item>
         <Form.Item
+          name="telephone"
+          label="联系电话"
+          rules={[
+            {
+              required: true,
+              message: '请输入学校联系电话!',
+              whitespace: true,
+            },
+          ]}
+        >
+          <Input placeholder='请输入学校联系电话' />
+        </Form.Item>
+        <Form.Item 
+          label="学校图片"
+        >
+          <PicturesWall ref={image} imgs={[]}/>
+        </Form.Item>
+        <Form.Item label="学校介绍" labelCol={{span: 2}} wrapperCol={{span: 20}}>
+          <RichTextEditor ref={introduce} detail={''}/>
+        </Form.Item>
+        <Form.Item
           name="address"
           label="详细地址"
           rules={[
@@ -195,6 +230,22 @@ const SchoolAdd = (props) => {
           ]}
         >
           <Input placeholder='请输入学校地址' />
+        </Form.Item>
+        <Form.Item
+          name="traffic_guidance"
+          label="交通指引"
+          rules={[
+            {
+              required: true,
+              message: '请输入学校交通指引!',
+              whitespace: true,
+            },
+          ]}
+        >
+          <Input placeholder='请输入学校交通指引' />
+        </Form.Item>
+        <Form.Item label="预约须知" labelCol={{span: 2}} wrapperCol={{span: 20}}>
+          <RichTextEditor ref={reservation_notice} detail={''}/>
         </Form.Item>
         <Form.Item
           label="开放区域"
