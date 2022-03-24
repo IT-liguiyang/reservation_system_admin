@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Modal, Image } from 'antd';
 
+import { BASE_IMG_URL } from './constants';
+
 const ShowContent = (props) => {
 
   // 规定接收父元素的数据类型
@@ -18,8 +20,6 @@ const ShowContent = (props) => {
 
   const { isShowContent, current_click_item } = props;
 
-  const basicImgUrl = 'http://localhost:5000/upload/';
-
   return (
     <Modal
       title='详情'
@@ -34,7 +34,7 @@ const ShowContent = (props) => {
         ):(
           current_click_item.map((item, index) => {
             return (
-              <Image key={index} src={basicImgUrl+item}></Image>
+              <Image key={index} src={BASE_IMG_URL+item}></Image>
             );
           })
         )
