@@ -11,9 +11,12 @@ import {
 
 import LinkButton from '../../components/link-button';
 import { reqUpdateUser } from '../../api';
+import PicturesWall from '../../utils/pictures-wall';
 
 // 添加用户组件
 const UserUpdate = (props) => {
+
+  const imageUpload = React.createRef();  // 得到头像上传对象
 
   // 头部左侧标题
   const title = (
@@ -33,21 +36,24 @@ const UserUpdate = (props) => {
     // 1. 得到输入的值
     const { 
       username, 
-      password, 
+      // password, 
       realname, 
       ID_number, 
       address, 
       profession, 
+      realname_authentication
     } = values;
 
     // 2. 生成预约信息对象
     const userObj = {
       username, 
-      password, 
+      // password, 
+      head_portrait: imageUpload.current? imageUpload.current.getImgs():{},
       realname, 
       ID_number, 
       address, 
       profession, 
+      realname_authentication
     };
     console.log(userObj);
 
@@ -81,11 +87,13 @@ const UserUpdate = (props) => {
   const userObj = props.history.location.state;
   const { 
     username, 
-    password, 
+    // password, 
+    head_portrait,
     realname, 
     ID_number, 
     address, 
     profession, 
+    realname_authentication
   } = userObj || {};
 
   return (
@@ -95,11 +103,12 @@ const UserUpdate = (props) => {
         onFinish={UpdateUser}
         initialValues={{  // 为表单类input输入框设置初始默认值
           username, 
-          password, 
+          // password, 
           realname, 
           ID_number, 
           address, 
           profession, 
+          realname_authentication
         }}
       >
         <Form.Item
@@ -119,11 +128,16 @@ const UserUpdate = (props) => {
         >
           <Input placeholder='请输入账号(手机号)' />
         </Form.Item>
-        <Form.Item
+        {/* <Form.Item
           name="password"
           label="密码"
         >
           <Input.Password disabled/>
+        </Form.Item> */}
+        <Form.Item 
+          label="学校图片"
+        >
+          <PicturesWall ref={imageUpload} imgs={head_portrait}/>
         </Form.Item>
         <Form.Item
           name="realname"
@@ -180,6 +194,19 @@ const UserUpdate = (props) => {
           ]}
         >
           <Input placeholder='请输入职业' />
+        </Form.Item>
+        <Form.Item
+          name="realname_authentication"
+          label="实名认证"
+          rules={[
+            {
+              required: true,
+              message: '输入是否已实名认证!',
+              whitespace: true,
+            },
+          ]}
+        >
+          <Input placeholder='请输入“已完成”或“未完成”' />
         </Form.Item>
         <Form.Item>
           <Button type='primary' htmlType="submit">提交</Button>

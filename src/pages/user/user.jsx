@@ -10,7 +10,8 @@ import {
   message
 } from 'antd';
 
-import ShowContent from './show-content';
+import ShowContent from '../../utils/show-content';
+
 import LinkButton from '../../components/link-button';
 import { reqUser, reqDeleteUser, reqSearchUser } from '../../api';
 import {PAGE_SIZE} from '../../utils/constants';
@@ -30,15 +31,18 @@ export default class User extends Component {
     searchType: 'username', // 根据哪个字段搜索
     isShowContent: false, // 是否显示内容详情
     contentDetail:{},  // 内容详情
+    current_click_item:[] // 当前点击查看的一项
   };
 
   componentDidMount () {
     this.getUser(1);
   }
 
-  /* 显示用户内容详情 */
+  /* 显示内容详情 */
   showContent = (text, record) => {
+    console.log(text);
     this.setState({
+      current_click_item: text,
       contentDetail: record,
       isShowContent: true
     });
@@ -76,14 +80,24 @@ export default class User extends Component {
         width: 50,
         dataIndex: 'username',
       },
+      // {
+      //   title: '密码',
+      //   width: 80,
+      //   dataIndex: 'password',
+      // },
       {
-        title: '密码',
-        width: 80,
-        dataIndex: 'password',
+        title: '头像',
+        width: 110,
+        dataIndex: 'head_portrait',
+        render: (text, record, index) => {
+          return (
+            <LinkButton onClick={ ()=>this.showContent(text, record, index) }>点击查看</LinkButton>
+          );
+        }
       },
       {
         title: '姓名',
-        width: 110,
+        width: 100,
         dataIndex: 'realname',
       },
       {
@@ -100,6 +114,11 @@ export default class User extends Component {
         title: '职业',
         width: 80,
         dataIndex: 'profession',
+      },
+      {
+        title: '实名认证',
+        width: 100,
+        dataIndex: 'realname_authentication',
       },
       {
         title: '操作',
@@ -151,7 +170,7 @@ export default class User extends Component {
     this.initColumns();
 
     // 取出状态数据
-    const { isShowContent, contentDetail, user, total, loading, searchType, keyword } = this.state;
+    const { isShowContent, contentDetail, current_click_item, user, total, loading, searchType, keyword } = this.state;
 
     const title = (
       <span>
@@ -195,7 +214,7 @@ export default class User extends Component {
             onChange: this.getUser
           }}
         />
-        <ShowContent contentDetail={contentDetail} handleCloseShowContentModal={this.handleCloseShowContentModal} isShowContent={isShowContent} />
+        <ShowContent contentDetail={contentDetail} current_click_item={current_click_item} handleCloseShowContentModal={this.handleCloseShowContentModal} isShowContent={isShowContent} />
       </Card>
     );
   }

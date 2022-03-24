@@ -11,9 +11,12 @@ import {
 
 import LinkButton from '../../components/link-button';
 import { reqAddUser } from '../../api';
+import PicturesWall from '../../utils/pictures-wall';
 
 // 添加用户组件
 const UserAdd = (props) => {
+
+  const image = React.createRef();  // 得到头像上传对象
 
   // 头部左侧标题
   const title = (
@@ -34,21 +37,23 @@ const UserAdd = (props) => {
     // 1. 得到输入的值
     const { 
       username, 
-      password, 
+      // password, 
       realname, 
       ID_number, 
       address, 
       profession, 
+      realname_authentication
     } = values;
 
     // 2. 生成预约信息对象
     const userObj = {
       username, 
-      password, 
+      head_portrait: image.current? image.current.getImgs():{},
       realname, 
       ID_number, 
       address, 
       profession, 
+      realname_authentication
     };
 
     console.log(userObj);
@@ -101,22 +106,16 @@ const UserAdd = (props) => {
         >
           <Input placeholder='请输入账号(手机号)' />
         </Form.Item>
-        <Form.Item
-          name="res_username"
-          label="密码"
+        <Form.Item 
+          label="头像"
           rules={[
             {
               required: true,
-              message: '请输入账号(手机号)!',
-              whitespace: true,
+              message: '请上传图片!',
             },
-            {
-              pattern:/^[a-zA-Z][a-zA-Z0-9_]{8,12}$/, 
-              message:'8-12位, 字母开头且仅由字母,数字,下划线组成'
-            }
           ]}
         >
-          <Input.Password placeholder='请输入密码'/>
+          <PicturesWall ref={image} imgs={[]}/>
         </Form.Item>
         <Form.Item
           name="realname"
@@ -173,6 +172,19 @@ const UserAdd = (props) => {
           ]}
         >
           <Input placeholder='请输入职业' />
+        </Form.Item>
+        <Form.Item
+          name="realname_authentication"
+          label="实名认证"
+          rules={[
+            {
+              required: true,
+              message: '输入是否已实名认证!',
+              whitespace: true,
+            },
+          ]}
+        >
+          <Input placeholder='请输入“已完成”或“未完成”' />
         </Form.Item>
         <Form.Item>
           <Button type='primary' htmlType="submit">提交</Button>
