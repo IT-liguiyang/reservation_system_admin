@@ -10,8 +10,10 @@ import {
   message
 } from 'antd';
 
+import ShowImage from '../../utils/show-image';
 import ShowContent from './show-content';
 import ShowComment from './show-comment';
+import ShowLove from './show-love';
 import LinkButton from '../../components/link-button';
 import { reqDynamicSharings, reqDeleteDynamicSharing, reqSearchDynamicSharings } from '../../api';
 import {PAGE_SIZE} from '../../utils/constants';
@@ -33,6 +35,11 @@ export default class DynamicSharing extends Component {
     contentDetail:{},  // 内容详情
     isShowComment: false, // 是否显示评论详情
     commentDetail:{},  // 评论详情
+    isShowLove: false, // 是否显示点赞详情
+    LoveDetail:{},  // 点赞详情
+    isShowImage: false, // 是否显示图片详情
+    imageDetail:{},  // 内容详情
+    current_click_item:[] // 当前点击查看的一项
   };
 
   componentDidMount () {
@@ -69,6 +76,38 @@ export default class DynamicSharing extends Component {
     });
   }
 
+  /* 显示动态分享点赞详情 */
+  showLove = (text, record) => {
+    this.setState({
+      loveDetail: record,
+      isShowLove: true
+    });
+  }
+
+  /* 用于接收子组件返回的isShowLove状态 */
+  handleCloseShowLoveModal = (isShowLove) => {
+    this.setState({
+      isShowLove
+    });
+  }
+
+  /* 显示内容详情 */
+  ShowImage = (text, record) => {
+    console.log(text);
+    this.setState({
+      current_click_item: text,
+      imageDetail: record,
+      isShowImage: true
+    });
+  }
+
+  /* 用于接收子组件返回的isShowImage状态 */
+  handleCloseShowImageModal = (isShowImage) => {
+    this.setState({
+      isShowImage
+    });
+  }
+
   /* 删除动态分享 */
   deleteDynamicSharing = (dynamic_sharing) => {
     console.log(dynamic_sharing);
@@ -90,9 +129,24 @@ export default class DynamicSharing extends Component {
   initColumns = () => {
     this.columns = [
       {
-        title: '发布人',
-        width: 120,
-        dataIndex: 'publisher',
+        title: '发布人手机',
+        width: 90,
+        dataIndex: 'publish_username',
+      },
+      {
+        title: '发布人姓名',
+        width: 90,
+        dataIndex: 'publish_realname',
+      },
+      {
+        title: '发布人头像',
+        width: 90,
+        dataIndex: 'publish_avater',
+        render: (text, record, index) => {
+          return (
+            <LinkButton onClick={ ()=>this.ShowImage(text, record, index) }>点击查看</LinkButton>
+          );
+        }
       },
       {
         title: '发布时间',
@@ -110,9 +164,24 @@ export default class DynamicSharing extends Component {
         }
       },
       {
-        title: '点赞人数',
+        title: '图片列表',
+        width: 90,
+        dataIndex: 'image_list',
+        render: (text, record, index) => {
+          return (
+            <LinkButton onClick={ ()=>this.ShowImage(text, record, index) }>点击查看</LinkButton>
+          );
+        }
+      },
+      {
+        title: '点赞',
         width: 80,
-        dataIndex: 'like_number',
+        dataIndex: 'love',
+        render: (text, record, index) => {
+          return (
+            <LinkButton onClick={ ()=>this.showLove(text, record, index) }>点击查看</LinkButton>
+          );
+        }
       },
       {
         title: '评论内容',
@@ -174,7 +243,21 @@ export default class DynamicSharing extends Component {
     this.initColumns();
 
     // 取出状态数据
-    const { isShowContent, contentDetail, isShowComment, commentDetail,  dynamic_sharings, total, loading, searchType, keyword } = this.state;
+    const { 
+      isShowContent, 
+      contentDetail, 
+      isShowComment, 
+      commentDetail,  
+      dynamic_sharings, 
+      total, 
+      loading, 
+      searchType, 
+      keyword, 
+      current_click_item, 
+      isShowImage,
+      loveDetail,
+      isShowLove
+    } = this.state;
 
     const title = (
       <span>
@@ -218,8 +301,10 @@ export default class DynamicSharing extends Component {
             onChange: this.getDynamicSharings
           }}
         />
+        <ShowImage contentDetail={contentDetail} current_click_item={current_click_item} handleCloseShowImageModal={this.handleCloseShowImageModal} isShowImage={isShowImage} />
         <ShowContent contentDetail={contentDetail} handleCloseShowContentModal={this.handleCloseShowContentModal} isShowContent={isShowContent} />
         <ShowComment commentDetail={commentDetail} handleCloseShowCommentModal={this.handleCloseShowCommentModal} isShowComment={isShowComment} />
+        <ShowLove loveDetail={loveDetail} handleCloseShowLoveModal={this.handleCloseShowLoveModal} isShowLove={isShowLove} />
       </Card>
     );
   }
