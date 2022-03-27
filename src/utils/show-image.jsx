@@ -4,26 +4,28 @@ import { Modal, Image } from 'antd';
 
 import { BASE_IMG_URL } from './constants';
 
-const ShowContent = (props) => {
+const ShowImage = (props) => {
 
   // 规定接收父元素的数据类型
-  ShowContent.propTypes ={
-    isShowContent: PropTypes.bool.isRequired,
+  ShowImage.propTypes ={
+    isShowImage: PropTypes.bool.isRequired,
     current_click_item: PropTypes.any.isRequired, // 可能是String, 也可能是Array
-    handleCloseShowContentModal:PropTypes.func.isRequired
+    handleCloseShowImageModal:PropTypes.func.isRequired
   };
 
   // 向父元素传递关闭模态框
   const closeModal = () => {
-    props.handleCloseShowContentModal(false);
+    props.handleCloseShowImageModal(false);
   };
 
-  const { isShowContent, current_click_item } = props;
+  const { isShowImage, current_click_item } = props;
+
+  console.log('666', current_click_item);
 
   return (
     <Modal
       title='详情'
-      visible={isShowContent}
+      visible={isShowImage}
       onCancel={closeModal}
       footer={[]}
       style={{userSelect: 'true'}}
@@ -34,7 +36,7 @@ const ShowContent = (props) => {
         ):(
           current_click_item.map((item, index) => {
             return (
-              <Image key={index} src={BASE_IMG_URL+item}></Image>
+              <Image key={index} src={BASE_IMG_URL + item}></Image>
             );
           })
         )
@@ -43,4 +45,4 @@ const ShowContent = (props) => {
   );
 };
 
-export default ShowContent;
+export default ShowImage;

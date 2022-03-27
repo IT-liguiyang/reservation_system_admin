@@ -10,7 +10,7 @@ import {
   message
 } from 'antd';
 
-import ShowContent from '../../utils/show-content';
+import ShowImage from '../../utils/show-image';
 
 import LinkButton from '../../components/link-button';
 import { reqUser, reqDeleteUser, reqSearchUser } from '../../api';
@@ -29,7 +29,7 @@ export default class User extends Component {
     loading: false, // 是否正在加载中
     keyword: '', // 搜索的关键字
     searchType: 'username', // 根据哪个字段搜索
-    isShowContent: false, // 是否显示内容详情
+    isShowImage: false, // 是否显示内容详情
     contentDetail:{},  // 内容详情
     current_click_item:[] // 当前点击查看的一项
   };
@@ -39,19 +39,19 @@ export default class User extends Component {
   }
 
   /* 显示内容详情 */
-  showContent = (text, record) => {
+  ShowImage = (text, record) => {
     console.log(text);
     this.setState({
       current_click_item: text,
       contentDetail: record,
-      isShowContent: true
+      isShowImage: true
     });
   }
 
-  /* 用于接收子组件返回的isShowContent状态 */
-  handleCloseShowContentModal = (isShowContent) => {
+  /* 用于接收子组件返回的isShowImage状态 */
+  handleCloseShowImageModal = (isShowImage) => {
     this.setState({
-      isShowContent
+      isShowImage
     });
   }
 
@@ -91,7 +91,7 @@ export default class User extends Component {
         dataIndex: 'head_portrait',
         render: (text, record, index) => {
           return (
-            <LinkButton onClick={ ()=>this.showContent(text, record, index) }>点击查看</LinkButton>
+            <LinkButton onClick={ ()=>this.ShowImage(text, record, index) }>点击查看</LinkButton>
           );
         }
       },
@@ -170,7 +170,7 @@ export default class User extends Component {
     this.initColumns();
 
     // 取出状态数据
-    const { isShowContent, contentDetail, current_click_item, user, total, loading, searchType, keyword } = this.state;
+    const { isShowImage, contentDetail, current_click_item, user, total, loading, searchType, keyword } = this.state;
 
     const title = (
       <span>
@@ -214,7 +214,7 @@ export default class User extends Component {
             onChange: this.getUser
           }}
         />
-        <ShowContent contentDetail={contentDetail} current_click_item={current_click_item} handleCloseShowContentModal={this.handleCloseShowContentModal} isShowContent={isShowContent} />
+        <ShowImage contentDetail={contentDetail} current_click_item={current_click_item} handleCloseShowImageModal={this.handleCloseShowImageModal} isShowImage={isShowImage} />
       </Card>
     );
   }

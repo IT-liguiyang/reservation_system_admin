@@ -13,7 +13,7 @@ import {
 import LinkButton from '../../components/link-button';
 import ShowOpenAreas from './show-open-areas';
 import ShowOpenTime from './show-open-time';
-import ShowContent from '../../utils/show-content';
+import ShowImage from '../../utils/show-image';
 import { reqSchools, reqSearchSchools, reqDeleteSchool} from '../../api';
 import {PAGE_SIZE} from '../../utils/constants';
 
@@ -34,7 +34,7 @@ export default class School extends Component {
     isShowOpenTime: false, // 是否显示开放区域详情
     openAreasDetail:[],  // 开放区域详情
     openTimeDetail:[],  // 开放时间详情
-    isShowContent: false, // 是否显示内容详情
+    isShowImage: false, // 是否显示内容详情
     contentDetail:{},  // 内容详情
     current_click_item:[] // 当前点击查看的一项
   };
@@ -74,19 +74,19 @@ export default class School extends Component {
   }
 
     /* 显示内容详情 */
-    showContent = (text, record) => {
+    ShowImage = (text, record) => {
       console.log(text);
       this.setState({
         current_click_item: text,
         contentDetail: record,
-        isShowContent: true
+        isShowImage: true
       });
     }
   
-    /* 用于接收子组件返回的isShowContent状态 */
-    handleCloseShowContentModal = (isShowContent) => {
+    /* 用于接收子组件返回的isShowImage状态 */
+    handleCloseShowImageModal = (isShowImage) => {
       this.setState({
-        isShowContent
+        isShowImage
       });
     }
 
@@ -132,7 +132,7 @@ export default class School extends Component {
         dataIndex: 'image',
         render: (text, record, index) => {
           return (
-            <LinkButton onClick={ ()=>this.showContent(text, record, index) }>点击查看</LinkButton>
+            <LinkButton onClick={ ()=>this.ShowImage(text, record, index) }>点击查看</LinkButton>
           );
         }
       },
@@ -142,7 +142,7 @@ export default class School extends Component {
         dataIndex: 'introduce',
         render: (text, record, index) => {
           return (
-            <LinkButton onClick={ ()=>this.showContent(text, record, index) }>点击查看</LinkButton>
+            <LinkButton onClick={ ()=>this.ShowImage(text, record, index) }>点击查看</LinkButton>
           );
         }
       },
@@ -157,7 +157,7 @@ export default class School extends Component {
         dataIndex: 'traffic_guidance',
         render: (text, record, index) => {
           return (
-            <LinkButton onClick={ ()=>this.showContent(text, record, index) }>点击查看</LinkButton>
+            <LinkButton onClick={ ()=>this.ShowImage(text, record, index) }>点击查看</LinkButton>
           );
         }
       },
@@ -167,7 +167,7 @@ export default class School extends Component {
         dataIndex: 'reservation_notice',
         render: (text, record, index) => {
           return (
-            <LinkButton onClick={ ()=>this.showContent(text, record, index) }>点击查看</LinkButton>
+            <LinkButton onClick={ ()=>this.ShowImage(text, record, index) }>点击查看</LinkButton>
           );
         }
       },
@@ -238,7 +238,7 @@ export default class School extends Component {
   }
 
   render() {
-    const { isShowOpenAreas, openAreasDetail, isShowOpenTime, openTimeDetail, isShowContent, contentDetail, current_click_item } = this.state;
+    const { isShowOpenAreas, openAreasDetail, isShowOpenTime, openTimeDetail, isShowImage, contentDetail, current_click_item } = this.state;
     this.initColumns();
 
     // 取出状态数据
@@ -288,7 +288,7 @@ export default class School extends Component {
         />
         <ShowOpenAreas openAreasDetail={openAreasDetail} handleCloseShowOpenAreasModal={this.handleCloseShowOpenAreasModal} isShowOpenAreas={isShowOpenAreas} />
         <ShowOpenTime openTimeDetail={openTimeDetail} handleCloseShowOpenTimeModal={this.handleCloseShowOpenTimeModal} isShowOpenTime={isShowOpenTime} />
-        <ShowContent contentDetail={contentDetail} current_click_item={current_click_item} handleCloseShowContentModal={this.handleCloseShowContentModal} isShowContent={isShowContent} />
+        <ShowImage contentDetail={contentDetail} current_click_item={current_click_item} handleCloseShowImageModal={this.handleCloseShowImageModal} isShowImage={isShowImage} />
       </Card>
     );
   }
