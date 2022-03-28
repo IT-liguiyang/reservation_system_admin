@@ -2,27 +2,28 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Modal } from 'antd';
 
-const ShowContent = (props) => {
+const ShowPublishContent = (props) => {
 
   // 规定接收父元素的数据类型
-  ShowContent.propTypes ={
-    isShowContent: PropTypes.bool.isRequired,
+  ShowPublishContent.propTypes ={
+    detailTitle: PropTypes.string.isRequired,
+    isShowPublishContent: PropTypes.bool.isRequired,
     contentDetail: PropTypes.object.isRequired,
-    handleCloseShowContentModal:PropTypes.func.isRequired
+    handleCloseShowPublishContentModal:PropTypes.func.isRequired
   };
 
   // 向父元素传递关闭模态框
   const closeModal = () => {
-    props.handleCloseShowContentModal(false);
+    props.handleCloseShowPublishContentModal(false);
   };
 
-  const { isShowContent, contentDetail } = props;
+  const { isShowPublishContent, contentDetail, detailTitle } = props;
   const { publisher, pub_time, pub_theme, pub_content } = contentDetail;
 
   return (
     <Modal
-      title='新闻内容详情'
-      visible={isShowContent}
+      title={detailTitle}
+      visible={isShowPublishContent}
       onCancel={closeModal}
       footer={[]}
       style={{userSelect: 'true'}}
@@ -37,4 +38,4 @@ const ShowContent = (props) => {
   );
 };
 
-export default ShowContent;
+export default ShowPublishContent;

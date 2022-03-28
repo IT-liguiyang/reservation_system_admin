@@ -10,8 +10,8 @@ import {
   message
 } from 'antd';
 
-import ShowImage from '../../utils/show-image';
-import ShowContent from './show-content';
+import ShowImageOrContent from '../../utils/show-image-or-content';
+import ShowPublishContent from '../../utils/show-publish-content';
 import ShowComment from './show-comment';
 import ShowLove from './show-love';
 import LinkButton from '../../components/link-button';
@@ -31,13 +31,14 @@ export default class DynamicSharing extends Component {
     loading: false, // 是否正在加载中
     keyword: '', // 搜索的关键字
     searchType: 'dynamic_sharingPublisher', // 根据哪个字段搜索
-    isShowContent: false, // 是否显示内容详情
+    isShowPublishContent: false, // 是否显示内容详情
+    detailTitle: '动态分享详情', // 设置标题
     contentDetail:{},  // 内容详情
     isShowComment: false, // 是否显示评论详情
     commentDetail:{},  // 评论详情
     isShowLove: false, // 是否显示点赞详情
     LoveDetail:{},  // 点赞详情
-    isShowImage: false, // 是否显示图片详情
+    isShowImageOrContent: false, // 是否显示图片详情
     imageDetail:{},  // 内容详情
     current_click_item:[] // 当前点击查看的一项
   };
@@ -47,17 +48,17 @@ export default class DynamicSharing extends Component {
   }
 
   /* 显示动态分享内容详情 */
-  showContent = (text, record) => {
+  ShowPublishContent = (text, record) => {
     this.setState({
       contentDetail: record,
-      isShowContent: true
+      isShowPublishContent: true
     });
   }
 
-  /* 用于接收子组件返回的isShowContent状态 */
-  handleCloseShowContentModal = (isShowContent) => {
+  /* 用于接收子组件返回的isShowPublishContent状态 */
+  handleCloseShowPublishContentModal = (isShowPublishContent) => {
     this.setState({
-      isShowContent
+      isShowPublishContent
     });
   }
 
@@ -92,19 +93,19 @@ export default class DynamicSharing extends Component {
   }
 
   /* 显示内容详情 */
-  ShowImage = (text, record) => {
+  ShowImageOrContent = (text, record) => {
     console.log(text);
     this.setState({
       current_click_item: text,
       imageDetail: record,
-      isShowImage: true
+      isShowImageOrContent: true
     });
   }
 
-  /* 用于接收子组件返回的isShowImage状态 */
-  handleCloseShowImageModal = (isShowImage) => {
+  /* 用于接收子组件返回的isShowImageOrContent状态 */
+  handleCloseShowImageOrContentModal = (isShowImageOrContent) => {
     this.setState({
-      isShowImage
+      isShowImageOrContent
     });
   }
 
@@ -144,7 +145,7 @@ export default class DynamicSharing extends Component {
         dataIndex: 'publish_avater',
         render: (text, record, index) => {
           return (
-            <LinkButton onClick={ ()=>this.ShowImage(text, record, index) }>点击查看</LinkButton>
+            <LinkButton onClick={ ()=>this.ShowImageOrContent(text, record, index) }>点击查看</LinkButton>
           );
         }
       },
@@ -159,7 +160,7 @@ export default class DynamicSharing extends Component {
         dataIndex: 'pub_content',
         render: (text, record, index) => {
           return (
-            <LinkButton onClick={ ()=>this.showContent(text, record, index) }>点击查看</LinkButton>
+            <LinkButton onClick={ ()=>this.ShowPublishContent(text, record, index) }>点击查看</LinkButton>
           );
         }
       },
@@ -169,7 +170,7 @@ export default class DynamicSharing extends Component {
         dataIndex: 'image_list',
         render: (text, record, index) => {
           return (
-            <LinkButton onClick={ ()=>this.ShowImage(text, record, index) }>点击查看</LinkButton>
+            <LinkButton onClick={ ()=>this.ShowImageOrContent(text, record, index) }>点击查看</LinkButton>
           );
         }
       },
@@ -244,7 +245,8 @@ export default class DynamicSharing extends Component {
 
     // 取出状态数据
     const { 
-      isShowContent, 
+      isShowPublishContent, 
+      detailTitle,
       contentDetail, 
       isShowComment, 
       commentDetail,  
@@ -254,7 +256,7 @@ export default class DynamicSharing extends Component {
       searchType, 
       keyword, 
       current_click_item, 
-      isShowImage,
+      isShowImageOrContent,
       loveDetail,
       isShowLove
     } = this.state;
@@ -301,10 +303,32 @@ export default class DynamicSharing extends Component {
             onChange: this.getDynamicSharings
           }}
         />
-        <ShowImage contentDetail={contentDetail} current_click_item={current_click_item} handleCloseShowImageModal={this.handleCloseShowImageModal} isShowImage={isShowImage} />
-        <ShowContent contentDetail={contentDetail} handleCloseShowContentModal={this.handleCloseShowContentModal} isShowContent={isShowContent} />
-        <ShowComment commentDetail={commentDetail} handleCloseShowCommentModal={this.handleCloseShowCommentModal} isShowComment={isShowComment} />
-        <ShowLove loveDetail={loveDetail} handleCloseShowLoveModal={this.handleCloseShowLoveModal} isShowLove={isShowLove} />
+        <ShowImageOrContent 
+          contentDetail={contentDetail} 
+          current_click_item={current_click_item} 
+          handleCloseShowImageOrContentModal={this.handleCloseShowImageOrContentModal} 
+          isShowImageOrContent={isShowImageOrContent} 
+
+        />
+        <ShowPublishContent 
+          detailTitle={detailTitle} 
+          contentDetail={contentDetail} 
+          handleCloseShowPublishContentModal={this.handleCloseShowPublishContentModal} 
+          isShowPublishContent={isShowPublishContent} 
+
+        />
+        <ShowComment 
+          commentDetail={commentDetail} 
+          handleCloseShowCommentModal={this.handleCloseShowCommentModal} 
+          isShowComment={isShowComment} 
+
+        />
+        <ShowLove 
+          loveDetail={loveDetail} 
+          handleCloseShowLoveModal={this.handleCloseShowLoveModal} 
+          isShowLove={isShowLove} 
+          
+        />
       </Card>
     );
   }

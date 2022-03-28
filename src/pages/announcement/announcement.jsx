@@ -10,7 +10,7 @@ import {
   message
 } from 'antd';
 
-import ShowContent from './show-content';
+import ShowPublishContent from '../../utils/show-publish-content';
 import LinkButton from '../../components/link-button';
 import { reqAnnouncements, reqDeleteAnnouncement, reqSearchAnnouncements } from '../../api';
 import {PAGE_SIZE} from '../../utils/constants';
@@ -28,8 +28,9 @@ export default class Announcement extends Component {
     loading: false, // 是否正在加载中
     keyword: '', // 搜索的关键字
     searchType: 'announcementTheme', // 根据哪个字段搜索
-    isShowContent: false, // 是否显示内容详情
+    isShowPublishContent: false, // 是否显示内容详情
     contentDetail:{},  // 内容详情
+    detailTitle: '公告内容详情'
   };
 
   componentDidMount () {
@@ -37,17 +38,17 @@ export default class Announcement extends Component {
   }
 
   /* 显示公告内容详情 */
-  showContent = (text, record) => {
+  ShowPublishContent = (text, record) => {
     this.setState({
       contentDetail: record,
-      isShowContent: true
+      isShowPublishContent: true
     });
   }
 
-  /* 用于接收子组件返回的isShowContent状态 */
-  handleCloseShowContentModal = (isShowContent) => {
+  /* 用于接收子组件返回的isShowPublishContent状态 */
+  handleCloseShowPublishContentModal = (isShowPublishContent) => {
     this.setState({
-      isShowContent
+      isShowPublishContent
     });
   }
 
@@ -92,7 +93,7 @@ export default class Announcement extends Component {
         dataIndex: 'pub_content',
         render: (text, record, index) => {
           return (
-            <LinkButton onClick={ ()=>this.showContent(text, record, index) }>点击查看</LinkButton>
+            <LinkButton onClick={ ()=>this.ShowPublishContent(text, record, index) }>点击查看</LinkButton>
           );
         }
       },
@@ -146,7 +147,16 @@ export default class Announcement extends Component {
     this.initColumns();
 
     // 取出状态数据
-    const { isShowContent, contentDetail, announcements, total, loading, searchType, keyword } = this.state;
+    const { 
+      isShowPublishContent, 
+      detailTitle, 
+      contentDetail, 
+      announcements, 
+      total, 
+      loading, 
+      searchType, 
+      keyword 
+    } = this.state;
 
     const title = (
       <span>
@@ -190,7 +200,12 @@ export default class Announcement extends Component {
             onChange: this.getAnnouncements
           }}
         />
-        <ShowContent contentDetail={contentDetail} handleCloseShowContentModal={this.handleCloseShowContentModal} isShowContent={isShowContent} />
+        <ShowPublishContent 
+          detailTitle={detailTitle} 
+          contentDetail={contentDetail} 
+          handleCloseShowPublishContentModal={this.handleCloseShowPublishContentModal} 
+          isShowPublishContent={isShowPublishContent} 
+        />
       </Card>
     );
   }

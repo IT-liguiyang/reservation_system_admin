@@ -10,7 +10,7 @@ import {
   message
 } from 'antd';
 
-import ShowImage from '../../utils/show-image';
+import ShowImageOrContent from '../../utils/show-image-or-content';
 
 import LinkButton from '../../components/link-button';
 import { reqUser, reqDeleteUser, reqSearchUser } from '../../api';
@@ -29,8 +29,7 @@ export default class User extends Component {
     loading: false, // 是否正在加载中
     keyword: '', // 搜索的关键字
     searchType: 'username', // 根据哪个字段搜索
-    isShowImage: false, // 是否显示内容详情
-    contentDetail:{},  // 内容详情
+    isShowImageOrContent: false, // 是否显示内容详情
     current_click_item:[] // 当前点击查看的一项
   };
 
@@ -39,19 +38,19 @@ export default class User extends Component {
   }
 
   /* 显示内容详情 */
-  ShowImage = (text, record) => {
+  ShowImageOrContent = (text, record) => {
     console.log(text);
     this.setState({
       current_click_item: text,
       contentDetail: record,
-      isShowImage: true
+      isShowImageOrContent: true
     });
   }
 
-  /* 用于接收子组件返回的isShowImage状态 */
-  handleCloseShowImageModal = (isShowImage) => {
+  /* 用于接收子组件返回的isShowImageOrContent状态 */
+  handleCloseShowImageOrContentModal = (isShowImageOrContent) => {
     this.setState({
-      isShowImage
+      isShowImageOrContent
     });
   }
 
@@ -80,18 +79,13 @@ export default class User extends Component {
         width: 50,
         dataIndex: 'username',
       },
-      // {
-      //   title: '密码',
-      //   width: 80,
-      //   dataIndex: 'password',
-      // },
       {
         title: '头像',
         width: 110,
         dataIndex: 'head_portrait',
         render: (text, record, index) => {
           return (
-            <LinkButton onClick={ ()=>this.ShowImage(text, record, index) }>点击查看</LinkButton>
+            <LinkButton onClick={ ()=>this.ShowImageOrContent(text, record, index) }>点击查看</LinkButton>
           );
         }
       },
@@ -170,7 +164,7 @@ export default class User extends Component {
     this.initColumns();
 
     // 取出状态数据
-    const { isShowImage, contentDetail, current_click_item, user, total, loading, searchType, keyword } = this.state;
+    const { isShowImageOrContent, current_click_item, user, total, loading, searchType, keyword } = this.state;
 
     const title = (
       <span>
@@ -214,7 +208,11 @@ export default class User extends Component {
             onChange: this.getUser
           }}
         />
-        <ShowImage contentDetail={contentDetail} current_click_item={current_click_item} handleCloseShowImageModal={this.handleCloseShowImageModal} isShowImage={isShowImage} />
+        <ShowImageOrContent 
+          current_click_item={current_click_item}
+          handleCloseShowImageOrContentModal={this.handleCloseShowImageOrContentModal} 
+          isShowImageOrContent={isShowImageOrContent}
+        />
       </Card>
     );
   }

@@ -10,7 +10,6 @@ import {
   message
 } from 'antd';
 
-import ShowContent from './show-content';
 import LinkButton from '../../components/link-button';
 import { reqSchoolAdmin, reqDeleteSchoolAdmin, reqSearchSchoolAdmin } from '../../api';
 import {PAGE_SIZE} from '../../utils/constants';
@@ -28,27 +27,10 @@ export default class school_admin extends Component {
     loading: false, // 是否正在加载中
     keyword: '', // 搜索的关键字
     searchType: 'school_name', // 根据哪个字段搜索
-    isShowContent: false, // 是否显示内容详情
-    contentDetail:{},  // 内容详情
   };
 
   componentDidMount () {
     this.getSchoolAdmin(1);
-  }
-
-  /* 显示学校管理员内容详情 */
-  showContent = (text, record) => {
-    this.setState({
-      contentDetail: record,
-      isShowContent: true
-    });
-  }
-
-  /* 用于接收子组件返回的isShowContent状态 */
-  handleCloseShowContentModal = (isShowContent) => {
-    this.setState({
-      isShowContent
-    });
   }
 
   /* 删除学校管理员 */
@@ -147,7 +129,7 @@ export default class school_admin extends Component {
     this.initColumns();
 
     // 取出状态数据
-    const { isShowContent, contentDetail, school_admin, total, loading, searchType, keyword } = this.state;
+    const { school_admin, total, loading, searchType, keyword } = this.state;
 
     const title = (
       <span>
@@ -191,7 +173,6 @@ export default class school_admin extends Component {
             onChange: this.getSchoolAdmin
           }}
         />
-        <ShowContent contentDetail={contentDetail} handleCloseShowContentModal={this.handleCloseShowContentModal} isShowContent={isShowContent} />
       </Card>
     );
   }

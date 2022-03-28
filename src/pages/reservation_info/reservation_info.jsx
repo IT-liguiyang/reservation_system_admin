@@ -10,7 +10,6 @@ import {
   message
 } from 'antd';
 
-import ShowContent from './show-content';
 import LinkButton from '../../components/link-button';
 import { reqReservationInfo, reqDeleteReservationInfo, reqSearchReservationInfo } from '../../api';
 import {PAGE_SIZE} from '../../utils/constants';
@@ -28,27 +27,10 @@ export default class reservation_info extends Component {
     loading: false, // 是否正在加载中
     keyword: '', // 搜索的关键字
     searchType: 'reservation_info_School', // 根据哪个字段搜索
-    isShowContent: false, // 是否显示内容详情
-    contentDetail:{},  // 内容详情
   };
 
   componentDidMount () {
     this.getReservationInfo(1);
-  }
-
-  /* 显示预约信息内容详情 */
-  showContent = (text, record) => {
-    this.setState({
-      contentDetail: record,
-      isShowContent: true
-    });
-  }
-
-  /* 用于接收子组件返回的isShowContent状态 */
-  handleCloseShowContentModal = (isShowContent) => {
-    this.setState({
-      isShowContent
-    });
   }
 
   /* 删除预约信息 */
@@ -176,7 +158,13 @@ export default class reservation_info extends Component {
     this.initColumns();
 
     // 取出状态数据
-    const { isShowContent, contentDetail, reservation_info, total, loading, searchType, keyword } = this.state;
+    const { 
+      reservation_info, 
+      total,
+      loading,
+      searchType,
+      keyword 
+    } = this.state;
 
     const title = (
       <span>
@@ -220,7 +208,6 @@ export default class reservation_info extends Component {
             onChange: this.getReservationInfo
           }}
         />
-        <ShowContent contentDetail={contentDetail} handleCloseShowContentModal={this.handleCloseShowContentModal} isShowContent={isShowContent} />
       </Card>
     );
   }
