@@ -79,13 +79,18 @@ export default class News extends Component {
       },
       {
         title: '发布时间',
-        width: 120,
-        dataIndex: 'pub_time',
+        width: 100,
+        dataIndex: 'real_pub_time',
       },
       {
         title: '新闻主题',
-        width: 120,
+        width: 100,
         dataIndex: 'pub_theme',
+      },
+      {
+        title: '新闻来源',
+        width: 100,
+        dataIndex: 'origin',
       },
       {
         title: '发布内容',
@@ -96,6 +101,11 @@ export default class News extends Component {
             <LinkButton onClick={ ()=>this.ShowPublishContent(text, record, index) }>点击查看</LinkButton>
           );
         }
+      },
+      {
+        title: '操作时间',
+        width: 100,
+        dataIndex: 'system_pub_time',
       },
       {
         title: '操作',

@@ -51,13 +51,15 @@ const NewsAdd = (props) => {
       real_publisher = result.data[0].school[1];
     }
 
-    // 4. 得到新闻主题
-    const { theme } = values;
+    // 4. 得到输入的主题，发布时间，新闻来源
+    const { theme, real_pub_time, origin } = values;
     // 5. 生成新闻对象
     const newsObj = {
-      publisher: admin.role_id === '1' ? '系统管理员-' + real_publisher : real_publisher,
-      pub_time: pub_time,
+      publisher: admin.role_id === '1' ?  '系统管理员' : real_publisher,
       pub_theme: theme,
+      origin: origin,
+      system_pub_time: pub_time,
+      real_pub_time: real_pub_time,
       pub_content: editor.current? editor.current.getDetail():{}
     };
 
@@ -107,9 +109,32 @@ const NewsAdd = (props) => {
         >
           <Input placeholder='请输入新闻主题' />
         </Form.Item>
-        {/* <Form.Item label="图片">
-          <PicturesWall ref={pw} imgs={imgs}/>
-        </Form.Item> */}
+        <Form.Item
+          name="real_pub_time"
+          label="发布时间"
+          rules={[
+            {
+              required: true,
+              message: '请输入发布时间!',
+              whitespace: true,
+            },
+          ]}
+        >
+          <Input placeholder='请输入发布时间，如 2022-03-20' />
+        </Form.Item>
+        <Form.Item
+          name="origin"
+          label="新闻来源"
+          rules={[
+            {
+              required: true,
+              message: '请输入新闻来源!',
+              whitespace: true,
+            },
+          ]}
+        >
+          <Input placeholder='请输入新闻来源' />
+        </Form.Item>
         <Form.Item label="内容" labelCol={{span: 2}} wrapperCol={{span: 20}}>
           <RichTextEditor ref={editor} detail={''}/>
         </Form.Item>
