@@ -18,7 +18,7 @@ const ShowPublishContent = (props) => {
   };
 
   const { isShowPublishContent, contentDetail, detailTitle } = props;
-  const { publisher, pub_time, pub_theme, pub_content } = contentDetail;
+  const { publisher, pub_realname, pub_time, pub_theme, pub_content } = contentDetail;
 
   return (
     <Modal
@@ -31,7 +31,7 @@ const ShowPublishContent = (props) => {
       <h2 style={{fontSize:25+'px'}}>{pub_theme}</h2>
       <span dangerouslySetInnerHTML={{__html: pub_content}}></span>
       <div style={{position:'absolute', right:30+'px', bottom:20+'px'}}>
-        <span>发布人：{publisher}</span> <br/>
+        <span>发布人：{publisher || pub_realname || '系统管理员'}</span> <br/>
         <span>发布时间：{pub_time}</span>
       </div>
     </Modal>

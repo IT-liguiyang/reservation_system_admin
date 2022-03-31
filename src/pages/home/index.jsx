@@ -11,6 +11,7 @@ import Announcement from '../announcement';
 import News from '../news';
 import DynamicSharing from '../dynamic_sharing';
 import OpinionsSuggestions from '../opinions_suggestions';
+import CommonProblems from '../common_problems';
 import ReservationInfo from '../reservation_info';
 import SchoolAdmin from '../school_admin';
 import SystemAdmin from '../system_admin';
@@ -49,6 +50,7 @@ export default class Home extends Component {
               <Route path='/news' component={News}/>
               <Route path='/dynamic_sharing' component={DynamicSharing}/>
               <Route path='/opinions_suggestions' component={OpinionsSuggestions}/>
+              <Route path='/common_problems' component={CommonProblems}/>
               <Route path='/reservation_info' component={ReservationInfo}/>
               <Route path='/admin/school_admin' component={SchoolAdmin}/>
               <Route path='/admin/system_admin' component={SystemAdmin}/>

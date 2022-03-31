@@ -10,6 +10,7 @@ import {
   UserOutlined,
   TeamOutlined,
   UserSwitchOutlined,
+  FileUnknownOutlined
 } from '@ant-design/icons';
 
 const menuList = [
@@ -43,6 +44,11 @@ const menuList = [
     title: '意见建议管理',
     key: '/opinions_suggestions',
     icon: <SolutionOutlined />
+  },
+  {
+    title: '常见问题管理',
+    key: '/common_problems',
+    icon: <FileUnknownOutlined />
   },
   {
     title: '预约信息管理',

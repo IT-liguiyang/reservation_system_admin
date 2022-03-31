@@ -143,6 +143,9 @@ class LeftNav extends Component {
     if(currentPath.indexOf('/opinions_suggestions')===0) { 
       currentPath = '/opinions_suggestions';
     }
+    if(currentPath.indexOf('/common_problems')===0) { 
+      currentPath = '/common_problems';
+    }
     if(currentPath.indexOf('/reservation_info')===0) { 
       currentPath = '/reservation_info';
     }
@@ -160,15 +163,6 @@ class LeftNav extends Component {
     }
     if(currentPath.indexOf('/role/school_admin')===0) { 
       currentPath = '/role/school_admin';
-    }
-    if(currentPath.indexOf('/charts/bar')===0) { 
-      currentPath = '/charts/bar';
-    }
-    if(currentPath.indexOf('/charts/line')===0) { 
-      currentPath = '/charts/line';
-    }
-    if(currentPath.indexOf('/charts/pie')===0) { 
-      currentPath = '/charts/pie';
     }
 
     // 准备数据(必须同步的)

@@ -176,6 +176,30 @@ export const reqUpdateOpinionsSuggestions = ({opinions_suggestionsObj, opinions_
 //#endregion
 
 /**
+ * 常见问题相关
+ */
+//#region 
+// 添加常见问题
+export const reqAddCommonProblems = (common_problemsObj) => ajax(BASE + '/manage/common_problems/add', common_problemsObj, 'POST');
+
+// 删除常见问题
+export const reqDeleteCommonProblems = (common_problemsId) => ajax(BASE + '/manage/common_problems/delete', {common_problemsId}, 'POST');
+
+// 获取常见问题列表
+export const reqCommonProblems = (pageNum, pageSize) => ajax(BASE + '/manage/common_problems/list', {pageNum, pageSize});
+
+// 搜索常见问题
+export const reqSearchCommonProblems = ({pageNum, pageSize, keyword, searchType}) => ajax(BASE + '/manage/common_problems/search', {
+  pageNum,
+  pageSize,
+  [searchType]: keyword,
+});
+
+// 更新常见问题信息
+export const reqUpdateCommonProblems = ({common_problemsObj, common_problemsId}) => ajax(BASE + '/manage/common_problems/update', {common_problemsObj, common_problemsId}, 'POST');
+//#endregion
+
+/**
  * 预约信息相关
  */
 //#region 
