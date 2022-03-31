@@ -12,8 +12,7 @@ import {
 import moment from 'moment';
 import LinkButton from '../../components/link-button';
 import RichTextEditor from '../../utils/rich-text-editor';
-import { reqAddOpinionsSuggestions, reqSchoolByRealname } from '../../api';
-import storageUtils from '../../utils/storageUtils';
+import { reqAddOpinionsSuggestions } from '../../api';
 
 // 添加意见建议组件
 const OpinionsSuggestionsAdd = (props) => {
@@ -38,24 +37,12 @@ const OpinionsSuggestionsAdd = (props) => {
     // 1. 得到当前时间
     const pub_time = moment().format('YYYY-MM-DD HH:mm:ss'); 
     console.log(pub_time);
-    // 2. 得到当前登录用户
-    const admin = storageUtils.getAdmin(); 
-    
-    let real_publisher = '';
-    // 3. 通过登录的学校管理员姓名查询所在学校
-    if(admin.role_id === '1'){
-      real_publisher = admin.realname;
-    }else{
-      const result = await reqSchoolByRealname(admin.realname);
-      console.log(result.data);
-      real_publisher = result.data[0].school[1];
-    }
 
-    // 4. 得到意见建议主题
+    // 2. 得到意见建议主题
     const { pub_realname, pub_username, pub_theme } = values;
-    // 4. 生成意见建议对象
+
+    // 3. 生成意见建议对象
     const opinions_suggestionsObj = {
-      publisher: admin.role_id === '1' ? '系统管理员-' + real_publisher : real_publisher,
       pub_realname,
       pub_username,
       pub_time,
@@ -65,9 +52,9 @@ const OpinionsSuggestionsAdd = (props) => {
 
     console.log(opinions_suggestionsObj);
 
-    // 2. 提交添加的请求
+    // 4. 提交添加的请求
     const result = await reqAddOpinionsSuggestions(opinions_suggestionsObj);
-    // 3. 更新列表显示
+    // 5. 更新列表显示
     if (result.status === 0) {
       message.success('添加意见建议成功！');
       // 确认跳转弹框
