@@ -6,26 +6,29 @@ import {
   Modal,
   Input,
   Button,
-  Form
+  Form,
+  Cascader
 } from 'antd';
 
 import moment from 'moment';
 import LinkButton from '../../components/link-button';
 import RichTextEditor from '../../utils/rich-text-editor';
-import { reqAddOpinionsSuggestions } from '../../api';
+import { reqAddFeedback } from '../../api';
+import PicturesWall from '../../utils/pictures-wall';
 
-// 添加意见建议组件
-const OpinionsSuggestionsAdd = (props) => {
+// 添加意见反馈组件
+const FeedbackAdd = (props) => {
 
   // 头部左侧标题
   const title = (
     <span>
       <LinkButton onClick={() => this.props.history.goBack()}></LinkButton>
-      <span>添加意见建议</span>
+      <span>添加意见反馈</span>
     </span>
   );
 
   const editor = React.createRef();  // 得到富文本输入框对象
+  const image = React.createRef();  // 得到图片上传对象
 
   // 指定Form.Item布局的配置对象
   const formItemLayout = {
@@ -33,39 +36,43 @@ const OpinionsSuggestionsAdd = (props) => {
     wrapperCol: { span: 11 }, // 右侧包裹的宽度
   };
 
-  const AddOpinionsSuggestions = async (values) => {
+  const AddFeedback = async (values) => {
     // 1. 得到当前时间
     const pub_time = moment().format('YYYY-MM-DD HH:mm:ss'); 
     console.log(pub_time);
 
-    // 2. 得到意见建议主题
-    const { pub_realname, pub_username, pub_theme } = values;
+    // 2. 得到输入的内容
+    const { pub_realname, pub_username, type, acceptor } = values;
 
-    // 3. 生成意见建议对象
-    const opinions_suggestionsObj = {
+    console.log('type', type);
+
+    // 3. 生成意见反馈对象
+    const feedbackObj = {
       pub_realname,
       pub_username,
+      type: type[0],
+      acceptor,
       pub_time,
-      pub_theme,
-      pub_content: editor.current? editor.current.getDetail():{}
+      pub_content: editor.current? editor.current.getDetail():{},
+      image_list: image.current? image.current.getImgs():{},
     };
 
-    console.log(opinions_suggestionsObj);
+    console.log(feedbackObj);
 
     // 4. 提交添加的请求
-    const result = await reqAddOpinionsSuggestions(opinions_suggestionsObj);
+    const result = await reqAddFeedback(feedbackObj);
     // 5. 更新列表显示
     if (result.status === 0) {
-      message.success('添加意见建议成功！');
+      message.success('添加意见反馈成功！');
       // 确认跳转弹框
       Modal.confirm({
-        title: '跳转到意见建议列表页面?',
+        title: '跳转到意见反馈列表页面?',
         content: '',
         okText: '是',
         okType: 'danger',
         cancelText: '否',
         onOk: () => {
-          props.history.goBack(); //跳转至意见建议列表页面
+          props.history.goBack(); //跳转至意见反馈列表页面
         },
         onCancel() {
           // formElement.current.resetFields(); //留在添加页面并清除输入的信息
@@ -77,11 +84,30 @@ const OpinionsSuggestionsAdd = (props) => {
     }
   };
 
+  const typeOption = [
+    {
+      value: '功能异常',
+      label: '功能异常',
+    },
+    {
+      value: '服务态度',
+      label: '服务态度',
+    },
+    {
+      value: '设置安全',
+      label: '设置安全',
+    },
+    {
+      value: '其他',
+      label: '其他',
+    }
+  ];
+
   return (
     <Card title={title}>
       <Form
         {...formItemLayout}
-        onFinish={AddOpinionsSuggestions}
+        onFinish={AddFeedback}
       >
         <Form.Item
           name="pub_realname"
@@ -113,28 +139,47 @@ const OpinionsSuggestionsAdd = (props) => {
           <Input placeholder='请输入您的手机号' />
         </Form.Item>
         <Form.Item
-          name="pub_theme"
-          label="主题"
+          name="type"
+          label="反馈类型"
           rules={[
             {
               required: true,
-              message: '请输入主题!',
+              message: '请选择反馈意见的类型!',
+            }
+          ]}
+        >
+          <Cascader placeholder='请选择反馈意见的类型'
+            options= {typeOption}
+          />
+        </Form.Item>
+        <Form.Item
+          name="acceptor"
+          label="受理人"
+          rules={[
+            {
+              required: true,
+              message: '请输入反馈意见的受理人!',
               whitespace: true,
             },
           ]}
         >
-          <Input placeholder='请输入主题' />
+          <Input placeholder='请输入反馈意见的受理人' />
         </Form.Item>
         <Form.Item label="内容" labelCol={{span: 2}} wrapperCol={{span: 20}}>
           <RichTextEditor ref={editor} detail={''}/>
         </Form.Item>
+        <Form.Item 
+          label="学校图片"
+        >
+          <PicturesWall ref={image} imgs={[]}/>
+        </Form.Item>
         <Form.Item>
           <Button type='primary' htmlType="submit">提交</Button>
-          <Button type='primary' style={{marginLeft:50+'px'}} onClick={() => props.history.push('/opinions_suggestions')}>返回</Button>
+          <Button type='primary' style={{marginLeft:50+'px'}} onClick={() => props.history.push('/feedback')}>返回</Button>
         </Form.Item>
       </Form>
     </Card>
   );
 };
 
-export default OpinionsSuggestionsAdd;
+export default FeedbackAdd;

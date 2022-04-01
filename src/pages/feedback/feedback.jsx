@@ -11,30 +11,33 @@ import {
 } from 'antd';
 
 import ShowPublishContent from '../../utils/show-publish-content';
+import ShowImageOrContent from '../../utils/show-image-or-content';
 import LinkButton from '../../components/link-button';
-import { reqOpinionsSuggestions, reqDeleteOpinionsSuggestions, reqSearchOpinionsSuggestions } from '../../api';
+import { reqFeedback, reqDeleteFeedback, reqSearchFeedback } from '../../api';
 import {PAGE_SIZE} from '../../utils/constants';
 
 const Option = Select.Option;
 
 /*
-OpinionsSuggestions的默认子路由组件
+Feedback的默认子路由组件
  */
-export default class OpinionsSuggestions extends Component {
+export default class Feedback extends Component {
 
   state = {
     total: 0, // 意见建议的总数量
-    opinions_suggestions: [], // 意见建议的数组
+    feedback: [], // 意见建议的数组
     loading: false, // 是否正在加载中
     keyword: '', // 搜索的关键字
-    searchType: 'opinions_suggestionsPublisher', // 根据哪个字段搜索
+    searchType: 'feedbackPublisher', // 根据哪个字段搜索
     isShowPublishContent: false, // 是否显示内容详情
     contentDetail:{},  // 内容详情
-    detailTitle: '意见建议内容详情', // 设置内容详情的标题
+    detailTitle: '反馈意见内容详情', // 设置内容详情的标题
+    isShowImageOrContent: false, // 是否显示内容详情
+    current_click_item: [] // 当前点击查看的一项
   };
 
   componentDidMount () {
-    this.getOpinionsSuggestions(1);
+    this.getFeedback(1);
   }
 
   /* 显示意见建议内容详情 */
@@ -52,16 +55,32 @@ export default class OpinionsSuggestions extends Component {
     });
   }
 
+  /* 显示内容详情 */
+  ShowImageOrContent = (text) => {
+    console.log(text);
+    this.setState({
+      current_click_item: text,
+      isShowImageOrContent: true
+    });
+  }
+
+  /* 用于接收子组件返回的isShowImageOrContent状态 */
+  handleCloseShowImageOrContentModal = (isShowImageOrContent) => {
+    this.setState({
+      isShowImageOrContent
+    });
+  }
+
   /* 删除意见建议 */
-  deleteOpinionsSuggestions = (opinions_suggestions) => {
-    console.log(opinions_suggestions);
+  deleteFeedback = (feedback) => {
+    console.log(feedback);
     Modal.confirm({
-      title: `确认删除${opinions_suggestions.pub_theme}吗?`,
+      title: `确认删除${feedback.pub_theme}吗?`,
       onOk: async () => {
-        const result = await reqDeleteOpinionsSuggestions(opinions_suggestions._id);
+        const result = await reqDeleteFeedback(feedback._id);
         if(result.status===0) {
           message.success('删除意见建议成功!');
-          this.getOpinionsSuggestions(1);
+          this.getFeedback(1);
         }
       }
     });
@@ -74,27 +93,32 @@ export default class OpinionsSuggestions extends Component {
     this.columns = [
       {
         title: '发布人姓名',
-        width: 100,
+        width: 90,
         dataIndex: 'pub_realname',
       },
       {
         title: '发布人手机号',
-        width: 100,
+        width: 80,
         dataIndex: 'pub_username',
       },
       {
+        title: '反馈类型',
+        width: 80,
+        dataIndex: 'type',
+      },
+      {
+        title: '受理人',
+        width: 150,
+        dataIndex: 'acceptor',
+      },
+      {
         title: '发布时间',
-        width: 110,
+        width: 150,
         dataIndex: 'pub_time',
       },
       {
-        title: '意见建议主题',
-        width: 150,
-        dataIndex: 'pub_theme',
-      },
-      {
         title: '发布内容',
-        width: 80,
+        width: 100,
         dataIndex: 'pub_content',
         render: (text, record, index) => {
           return (
@@ -103,14 +127,24 @@ export default class OpinionsSuggestions extends Component {
         }
       },
       {
+        title: '反馈图片',
+        width: 100,
+        dataIndex: 'image_list',
+        render: (text, record, index) => {
+          return (
+            <LinkButton onClick={ ()=>this.ShowImageOrContent(text, record, index) }>点击查看</LinkButton>
+          );
+        }
+      },
+      {
         title: '操作',
         width: 100,
-        render: (opinions_suggestions) => {
+        render: (feedback) => {
           return (
             <span>
-              {/*将 opinions_suggestions 对象使用state传递给目标路由组件*/}
-              <LinkButton onClick={() => this.props.history.push('/opinions_suggestions/update', opinions_suggestions)}>修改</LinkButton>
-              <LinkButton onClick={() => this.deleteOpinionsSuggestions(opinions_suggestions)}>删除</LinkButton>
+              {/*将 feedback 对象使用state传递给目标路由组件*/}
+              <LinkButton onClick={() => this.props.history.push('/feedback/update', feedback)}>修改</LinkButton>
+              <LinkButton onClick={() => this.deleteFeedback(feedback)}>删除</LinkButton>
             </span>
           );
         }
@@ -121,7 +155,7 @@ export default class OpinionsSuggestions extends Component {
   /*
     获取指定页码的列表数据显示
   */
-  getOpinionsSuggestions = async (pageNum) => {
+  getFeedback = async (pageNum) => {
     this.pageNum = pageNum; // 保存pageNum, 让其它方法可以看到
     this.setState({loading: true}); // 显示loading
 
@@ -131,9 +165,9 @@ export default class OpinionsSuggestions extends Component {
     // 如果搜索关键字有值, 说明我们要做搜索分页
     let result;
     if (keyword) {
-      result = await reqSearchOpinionsSuggestions({pageNum, pageSize: PAGE_SIZE, keyword, searchType});
+      result = await reqSearchFeedback({pageNum, pageSize: PAGE_SIZE, keyword, searchType});
     } else { // 一般分页请求
-      result = await reqOpinionsSuggestions(pageNum, PAGE_SIZE);
+      result = await reqFeedback(pageNum, PAGE_SIZE);
     }
 
     this.setState({loading: false}); // 隐藏loading
@@ -143,7 +177,7 @@ export default class OpinionsSuggestions extends Component {
       const {total, list} = result.data;
       this.setState({
         total,
-        opinions_suggestions: list
+        feedback: list
       });
     }
   }
@@ -156,11 +190,13 @@ export default class OpinionsSuggestions extends Component {
       isShowPublishContent, 
       contentDetail, 
       detailTitle,
-      opinions_suggestions,
+      feedback,
       total, 
       loading, 
       searchType,
-      keyword 
+      keyword,
+      isShowImageOrContent, 
+      current_click_item
     } = this.state;
 
     const title = (
@@ -170,8 +206,8 @@ export default class OpinionsSuggestions extends Component {
           style={{width: 150}}
           onChange={value => this.setState({searchType:value})}
         >
-          <Option value='opinions_suggestionsTheme'>按主题搜索</Option>
-          <Option value='opinions_suggestionsPublisher'>按发布人搜索</Option>
+          <Option value='feedbackTheme'>按主题搜索</Option>
+          <Option value='feedbackPublisher'>按发布人搜索</Option>
         </Select>
         <Input
           placeholder='关键字'
@@ -179,13 +215,13 @@ export default class OpinionsSuggestions extends Component {
           value={keyword}
           onChange={event => this.setState({keyword:event.target.value})}
         />
-        <Button type='primary' onClick={() => this.getOpinionsSuggestions(1)}>搜索</Button>
+        <Button type='primary' onClick={() => this.getFeedback(1)}>搜索</Button>
       </span>
     );
   
     const extra = (
-      <Button type='primary' onClick={() => this.props.history.push('/opinions_suggestions/add')}>
-        添加意见建议
+      <Button type='primary' onClick={() => this.props.history.push('/feedback/add')}>
+        添加意见反馈
       </Button>
     );
 
@@ -195,17 +231,18 @@ export default class OpinionsSuggestions extends Component {
           bordered
           rowKey='_id'
           loading={loading}
-          dataSource={opinions_suggestions}
+          dataSource={feedback}
           columns={this.columns}
           pagination={{
             current: this.pageNum,
             total,
             defaultPageSize: 6,
             showQuickJumper: true,
-            onChange: this.getOpinionsSuggestions
+            onChange: this.getFeedback
           }}
         />
         <ShowPublishContent detailTitle={detailTitle} contentDetail={contentDetail} handleCloseShowPublishContentModal={this.handleCloseShowPublishContentModal} isShowPublishContent={isShowPublishContent} />
+        <ShowImageOrContent current_click_item={current_click_item} handleCloseShowImageOrContentModal={this.handleCloseShowImageOrContentModal} isShowImageOrContent={isShowImageOrContent} />
       </Card>
     );
   }

@@ -41,8 +41,8 @@ const menuList = [
     icon: <GlobalOutlined />
   },
   {
-    title: '意见建议管理',
-    key: '/opinions_suggestions',
+    title: '意见反馈管理',
+    key: '/feedback',
     icon: <SolutionOutlined />
   },
   {

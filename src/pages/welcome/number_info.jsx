@@ -24,7 +24,7 @@ const NumberInfo = ()=> {
   const { announcementsLength } = numberList[2] || [];
   const { newsLength } = numberList[3] || [];
   const { dynamic_sharingsLength } = numberList[4] || [];
-  const { opinions_suggestionsLength } = numberList[5] || [];
+  const { feedbackLength } = numberList[5] || [];
   const { reservation_infosLength } = numberList[6] || [];
   const { school_adminsLength } = numberList[7] || [];
   const { system_adminsLength } = numberList[8] || [];
@@ -105,7 +105,7 @@ const NumberInfo = ()=> {
         hoverable
       >
         <Statistic
-          value={opinions_suggestionsLength}
+          value={feedbackLength}
           suffix="条"
           valueStyle={{fontSize:13}}
         />

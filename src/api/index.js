@@ -156,23 +156,23 @@ export const reqUpdateDynamicSharingComment = ({commentObj, commentId}) => ajax(
  */
 //#region 
 // 添加意见建议
-export const reqAddOpinionsSuggestions = (opinions_suggestionsObj) => ajax(BASE + '/manage/opinions_suggestions/add', opinions_suggestionsObj, 'POST');
+export const reqAddFeedback = (feedbackObj) => ajax(BASE + '/manage/feedback/add', feedbackObj, 'POST');
 
 // 删除意见建议
-export const reqDeleteOpinionsSuggestions = (opinions_suggestionsId) => ajax(BASE + '/manage/opinions_suggestions/delete', {opinions_suggestionsId}, 'POST');
+export const reqDeleteFeedback = (feedbackId) => ajax(BASE + '/manage/feedback/delete', {feedbackId}, 'POST');
 
 // 获取意见建议列表
-export const reqOpinionsSuggestions = (pageNum, pageSize) => ajax(BASE + '/manage/opinions_suggestions/list', {pageNum, pageSize});
+export const reqFeedback = (pageNum, pageSize) => ajax(BASE + '/manage/feedback/list', {pageNum, pageSize});
 
 // 查询意见建议列表
-export const reqSearchOpinionsSuggestions = ({pageNum, pageSize, keyword, searchType}) => ajax(BASE + '/manage/opinions_suggestions/search', {
+export const reqSearchFeedback = ({pageNum, pageSize, keyword, searchType}) => ajax(BASE + '/manage/feedback/search', {
   pageNum,
   pageSize,
   [searchType]: keyword,
 });
 
 // 更新意见建议信息
-export const reqUpdateOpinionsSuggestions = ({opinions_suggestionsObj, opinions_suggestionsId}) => ajax(BASE + '/manage/opinions_suggestions/update', {opinions_suggestionsObj, opinions_suggestionsId}, 'POST');
+export const reqUpdateFeedback = ({feedbackObj, feedbackId}) => ajax(BASE + '/manage/feedback/update', {feedbackObj, feedbackId}, 'POST');
 //#endregion
 
 /**

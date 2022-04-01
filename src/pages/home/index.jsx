@@ -10,7 +10,7 @@ import School from '../school';
 import Announcement from '../announcement';
 import News from '../news';
 import DynamicSharing from '../dynamic_sharing';
-import OpinionsSuggestions from '../opinions_suggestions';
+import Feedback from '../feedback';
 import CommonProblems from '../common_problems';
 import ReservationInfo from '../reservation_info';
 import SchoolAdmin from '../school_admin';
@@ -49,7 +49,7 @@ export default class Home extends Component {
               <Route path='/announcement' component={Announcement}/>
               <Route path='/news' component={News}/>
               <Route path='/dynamic_sharing' component={DynamicSharing}/>
-              <Route path='/opinions_suggestions' component={OpinionsSuggestions}/>
+              <Route path='/feedback' component={Feedback}/>
               <Route path='/common_problems' component={CommonProblems}/>
               <Route path='/reservation_info' component={ReservationInfo}/>
               <Route path='/admin/school_admin' component={SchoolAdmin}/>

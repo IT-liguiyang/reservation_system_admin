@@ -140,8 +140,8 @@ class LeftNav extends Component {
     if(currentPath.indexOf('/dynamic_sharing')===0) { 
       currentPath = '/dynamic_sharing';
     }
-    if(currentPath.indexOf('/opinions_suggestions')===0) { 
-      currentPath = '/opinions_suggestions';
+    if(currentPath.indexOf('/feedback')===0) { 
+      currentPath = '/feedback';
     }
     if(currentPath.indexOf('/common_problems')===0) { 
       currentPath = '/common_problems';
