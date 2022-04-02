@@ -94,8 +94,8 @@ const FeedbackAdd = (props) => {
       label: '服务态度',
     },
     {
-      value: '设置安全',
-      label: '设置安全',
+      value: '设施安全',
+      label: '设施安全',
     },
     {
       value: '其他',
