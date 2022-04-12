@@ -164,6 +164,9 @@ class LeftNav extends Component {
     if(currentPath.indexOf('/role/school_admin')===0) { 
       currentPath = '/role/school_admin';
     }
+    if(currentPath.indexOf('/booking_info')===0) { 
+      currentPath = '/booking_info';
+    }
 
     // 准备数据(必须同步的)
     this.menuNodes = this.getMenuNodes(menuList);

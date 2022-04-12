@@ -10,7 +10,8 @@ import {
   UserOutlined,
   TeamOutlined,
   UserSwitchOutlined,
-  FileUnknownOutlined
+  FileUnknownOutlined,
+  CalendarOutlined
 } from '@ant-design/icons';
 
 const menuList = [
@@ -93,6 +94,11 @@ const menuList = [
         icon: <UserOutlined />
       }
     ]
+  },
+  {
+    title: '场馆预约设置',
+    key: '/booking_info',
+    icon: <CalendarOutlined />
   },
 ];
 

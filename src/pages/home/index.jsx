@@ -18,6 +18,7 @@ import SystemAdmin from '../system_admin';
 import User from '../user';
 import SchoolAdminRole from '../role/school_admin';
 import SystemAdminRole from '../role/system_admin';
+import BookingInfo from '../booking_info';
 
 const { Footer, Sider, Content } = Layout;
 
@@ -57,6 +58,7 @@ export default class Home extends Component {
               <Route path='/user' component={User}/>
               <Route path='/role/school_admin' component={SchoolAdminRole}/>
               <Route path='/role/system_admin' component={SystemAdminRole}/>
+              <Route path='/booking_info' component={BookingInfo}/>
               {/* <Route component={NotFound}/> */}
             </Switch>
           </Content>

@@ -1,0 +1,48 @@
+.booking-info .operation-button {
+  display: flex;
+  flex-direction: row-reverse;
+  overflow: hidden;
+}
+.booking-info .operation-button .btn {
+  width: auto;
+  margin: 10px;
+}
+.booking-info .open-info {
+  display: flex;
+  margin-left: 10px;
+}
+.booking-info .open-info .item {
+  margin: 10px 0;
+  padding: 10px 10px;
+}
+.booking-info .open-info .item .date {
+  font-size: 18px;
+  font-weight: bold;
+}
+.booking-info .open-info .item .week {
+  padding: 0 20px;
+}
+.booking-info .open-info .item .place {
+  margin: 10px 5px;
+}
+.booking-info .open-info .item .place .placeName {
+  font-weight: bold;
+}
+.booking-info .open-info .item .place .am .am-bookedCount {
+  padding-left: 35px;
+}
+.booking-info .open-info .item .place .am .am-remaindCount {
+  padding-left: 35px;
+}
+.booking-info .open-info .item .place .pm .pm-bookedCount {
+  padding-left: 35px;
+}
+.booking-info .open-info .item .place .pm .pm-remaindCount {
+  padding-left: 35px;
+}
+.booking-info .open-info .other {
+  background-color: #f0d6da;
+}
+.booking-info .ant-col ant-form-item-control ant-col-xs-24 ant-col-sm-16 {
+  max-width: 80% !important;
+}

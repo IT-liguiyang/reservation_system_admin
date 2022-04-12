@@ -65,6 +65,9 @@ export const reqSearchSchools = ({pageNum, pageSize, keyword, searchType}) => aj
 // 获取学校列表
 export const reqSchools = (pageNum, pageSize) => ajax(BASE + '/manage/school/list', {pageNum, pageSize});
 
+// 通过学校名称获取学校列表
+export const reqSchoolByName = (schoolName) => ajax(BASE + '/manage/school_info_by_schoolName', {schoolName});
+
 //#endregion
 
 /**
@@ -197,6 +200,30 @@ export const reqSearchCommonProblems = ({pageNum, pageSize, keyword, searchType}
 
 // 更新常见问题信息
 export const reqUpdateCommonProblems = ({common_problemsObj, common_problemsId}) => ajax(BASE + '/manage/common_problems/update', {common_problemsObj, common_problemsId}, 'POST');
+//#endregion
+
+/**
+ * 预约设置相关
+ */
+//#region 
+// 添加预约设置
+export const reqAddBookingInfo = (booking_infoObj) => ajax(BASE + '/manage/booking_info/add', booking_infoObj, 'POST');
+
+// 删除预约设置
+export const reqDeleteBookingInfo = (booking_infoId) => ajax(BASE + '/manage/booking_info/delete', {booking_infoId}, 'POST');
+
+// 获取预约设置列表
+export const reqBookingInfo = (pageNum, pageSize) => ajax(BASE + '/manage/booking_info/list', {pageNum, pageSize});
+
+// 查询预约设置列表
+export const reqSearchBookingInfo = ({pageNum, pageSize, keyword, searchType}) => ajax(BASE + '/manage/booking_info/search', {
+  pageNum,
+  pageSize,
+  [searchType]: keyword,
+});
+
+// 更新预约设置
+export const reqUpdateBookingInfo = ({booking_infoObj, school_id}) => ajax(BASE + '/manage/booking_info/update', {booking_infoObj, school_id}, 'POST');
 //#endregion
 
 /**
