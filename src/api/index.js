@@ -65,7 +65,7 @@ export const reqSearchSchools = ({pageNum, pageSize, keyword, searchType}) => aj
 // 获取学校列表
 export const reqSchools = (pageNum, pageSize) => ajax(BASE + '/manage/school/list', {pageNum, pageSize});
 
-// 通过学校名称获取学校列表
+// 通过学校名称查询学校信息
 export const reqSchoolByName = (schoolName) => ajax(BASE + '/manage/school_info_by_schoolName', {schoolName});
 
 //#endregion
@@ -213,7 +213,10 @@ export const reqAddBookingInfo = (booking_infoObj) => ajax(BASE + '/manage/booki
 export const reqDeleteBookingInfo = (booking_infoId) => ajax(BASE + '/manage/booking_info/delete', {booking_infoId}, 'POST');
 
 // 获取预约设置列表
-export const reqBookingInfo = (pageNum, pageSize) => ajax(BASE + '/manage/booking_info/list', {pageNum, pageSize});
+export const reqBookingInfoBySchoolId = (school_id) => ajax(BASE + '/manage/booking_info/search_by_school_id', {school_id});
+
+// 通过学校 id 更新预约设置的 open_info
+export const reqUpdateOpenInfoInfoBySchoolId = ({newOpenInfo,school_id}) => ajax(BASE + '/manage/booking_info/update_open_info', {newOpenInfo, school_id}, 'POST');
 
 // 查询预约设置列表
 export const reqSearchBookingInfo = ({pageNum, pageSize, keyword, searchType}) => ajax(BASE + '/manage/booking_info/search', {
@@ -236,14 +239,18 @@ export const reqAddReservationInfo = (reservation_infoObj) => ajax(BASE + '/mana
 // 删除预约信息
 export const reqDeleteReservationInfo = (reservation_infoId) => ajax(BASE + '/manage/reservation_info/delete', {reservation_infoId}, 'POST');
 
+// // 获取预约信息列表
+// export const reqReservationInfo = (school_id, pageNum, pageSize) => ajax(BASE + '/manage/reservation_info/list', {school_id, pageNum, pageSize});
+
 // 获取预约信息列表
-export const reqReservationInfo = (pageNum, pageSize) => ajax(BASE + '/manage/reservation_info/list', {pageNum, pageSize});
+export const reqReservationInfo = (pageNum, pageSize, school_id) => ajax(BASE + '/manage/reservation_info/list_by_school_name', {pageNum, pageSize, school_id});
 
 // 查询预约信息列表
-export const reqSearchReservationInfo = ({pageNum, pageSize, keyword, searchType}) => ajax(BASE + '/manage/reservation_info/search', {
+export const reqSearchReservationInfo = ({school_id, pageNum, pageSize, keyword, searchType}) => ajax(BASE + '/manage/reservation_info/search', {
   pageNum,
   pageSize,
   [searchType]: keyword,
+  school_id
 });
 
 // 更新预约信息

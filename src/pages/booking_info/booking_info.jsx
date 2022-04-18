@@ -15,7 +15,14 @@ import VacationWeekend from './vacation_weekend';
 import Holiday from './holiday';
 
 import { isSchooldayWorkday, isSchooldayWeekend, isSaturday, isHoliday } from '../../utils/date-partition';
-import { reqBookingInfo, reqAddBookingInfo, reqDeleteBookingInfo, reqUpdateBookingInfo, reqSchoolByName } from '../../api';
+import { 
+  reqBookingInfoBySchoolId, 
+  reqAddBookingInfo, 
+  reqDeleteBookingInfo, 
+  reqUpdateBookingInfo, 
+  reqSchoolByName,
+  reqUpdateSchool 
+} from '../../api';
 import storageUtils from '../../utils/storageUtils';
 
 import './index.less';
@@ -50,7 +57,11 @@ const BookingInfo = ()=> {
 
   // 获取预约设置信息
   const getBookingInfo = async () => {
-    const result = await reqBookingInfo() || {};
+    const schoolInfo = await getSchoolInfo();
+    const { _id } = schoolInfo[0] || {};
+    const school_id = _id;
+    const result = await reqBookingInfoBySchoolId(school_id) || {};
+    console.log('result', result);
     if (result.data.length === 0) {
       message.warning('开放信息不存在！');
       return;
@@ -99,6 +110,55 @@ const BookingInfo = ()=> {
   const showUpdateDrawer = () => {
     setoperationFlag(2);
     setVisible(true);
+  };
+
+  const turnOnOrOffReservation = async () => {
+    const schoolInfo = await getSchoolInfo();
+    console.log('schoolInfo', schoolInfo);
+
+    const {
+      _id,
+      school, 
+      image,
+      telephone, 
+      address, 
+      longitude, 
+      latitude,
+      trafficGuidance,
+      openTimeInfoStr,
+      openAreasInfoStr,
+      schoolIntroduce,
+      reservationNotice,
+      openBooking
+    } = schoolInfo[0] || {};
+
+    // 1. 生成学校对象
+    const schoolObj = {
+      school, 
+      image,
+      telephone, 
+      address, 
+      longitude, 
+      latitude,
+      trafficGuidance,
+      openTimeInfoStr,
+      openAreasInfoStr,
+      schoolIntroduce,
+      reservationNotice,
+      openBooking: openBooking === '1' ? '0':'1'
+    };
+
+    const schoolId = _id;
+
+    // 2. 提交添加的请求
+    const result = await reqUpdateSchool({schoolObj, schoolId});
+
+    console.log(result);
+    if(result.status === 0){
+      message.success(openBooking === '1' ? '预约通道已关闭':'预约通道已开启');
+    }else if(result.status === 1){
+      message.warning(result.msg);
+    } 
   };
 
   // 更新开放日期的月份，每个月更新一次
@@ -233,26 +293,22 @@ const BookingInfo = ()=> {
       // 如果是教学期间 工作日
       if (schooldayWorkdayList.length > 0 && isSchooldayWorkday(oneday) === true) {
         tempOpenInfo.push(
-          {
-            [oneday]: [
-              schooldayWorkdayList[1].map((item) => {
-                return ({
-                  'day': oneday,
-                  'placeName': item.open_area,
-                  'timeIntervals': [
-                    schooldayWorkdayList[0].map((time) => {
-                      return ({
-                        'beginTime': time[0] || '',
-                        'endTime': time[1] || '',
-                        'bookedCount': '0',
-                        'maxBookingCount': time[0]? item.amount : '',
-                      });
-                    })
-                  ]
-                });
-              })
-            ],
-          }
+          schooldayWorkdayList[1].map((item) => {
+            return ({
+              'day': oneday,
+              'placeName': item.open_area,
+              'timeIntervals': [
+                schooldayWorkdayList[0].map((time) => {
+                  return ({
+                    'beginTime': time[0] || '',
+                    'endTime': time[1] || '',
+                    'bookedCount': '0',
+                    'maxBookingCount': time[0]? item.amount : '',
+                  });
+                })
+              ]
+            });
+          })
         );
         // 如果是教学期间周末
       } else if (schooldayWeekendList.length > 0 && isSchooldayWeekend(oneday) === true) {
@@ -260,74 +316,62 @@ const BookingInfo = ()=> {
         if (isSaturday(oneday) === true) {
           if(schooldayWeekendList[0][0].length === 0) return;
           tempOpenInfo.push(
-            {
-              [oneday]: [
-                schooldayWeekendList[1].map((item) => {
-                  return ({
-                    'day': oneday,
-                    'placeName': item.open_area,
-                    'timeIntervals': [
-                      schooldayWeekendList[0].slice(0,2).map((time) => {
-                        return ({
-                          'beginTime': time[0] || '',
-                          'endTime': time[1] || '',
-                          'bookedCount': '0',
-                          'maxBookingCount': time[0]? item.amount : '',
-                        });
-                      })
-                    ]
-                  });
-                })
-              ],
-            }
+            schooldayWeekendList[1].map((item) => {
+              return ({
+                'day': oneday,
+                'placeName': item.open_area,
+                'timeIntervals': [
+                  schooldayWeekendList[0].slice(0,2).map((time) => {
+                    return ({
+                      'beginTime': time[0] || '',
+                      'endTime': time[1] || '',
+                      'bookedCount': '0',
+                      'maxBookingCount': time[0]? item.amount : '',
+                    });
+                  })
+                ]
+              });
+            })
           );
         } else {
         // 如果是教学期间周末的 星期天
           tempOpenInfo.push(
-            {
-              [oneday]: [
-                schooldayWeekendList[1].map((item) => {
-                  return ({
-                    'day': oneday,
-                    'placeName': item.open_area,
-                    'timeIntervals': [
-                      schooldayWeekendList[0].slice(2,4).map((time) => {
-                        return ({
-                          'beginTime': time[0] || '',
-                          'endTime': time[1] || '',
-                          'bookedCount': '0',
-                          'maxBookingCount': time[0]? item.amount : '',
-                        });
-                      })
-                    ]
-                  });
-                })
-              ],
-            }
+            schooldayWeekendList[1].map((item) => {
+              return ({
+                'day': oneday,
+                'placeName': item.open_area,
+                'timeIntervals': [
+                  schooldayWeekendList[0].slice(2,4).map((time) => {
+                    return ({
+                      'beginTime': time[0] || '',
+                      'endTime': time[1] || '',
+                      'bookedCount': '0',
+                      'maxBookingCount': time[0]? item.amount : '',
+                    });
+                  })
+                ]
+              });
+            })
           );
         }
       } else if (holidaydayList.length > 0 && isHoliday(oneday) === true) {
         tempOpenInfo.push(
-          {
-            [oneday]: [
-              holidaydayList[1].map((item) => {
-                return ({
-                  'day': oneday,
-                  'placeName': item.open_area,
-                  'timeIntervals': [
-                    holidaydayList[0].map((time) => {
-                      return ({
-                        'beginTime': time[0] || '',
-                        'endTime': time[1] || '',
-                        'bookedCount': '0',
-                        'maxBookingCount': time[0]? item.amount : '',
-                      });
-                    })
-                  ]
-                });
-              })
-            ],
-          }
+          holidaydayList[1].map((item) => {
+            return ({
+              'day': oneday,
+              'placeName': item.open_area,
+              'timeIntervals': [
+                holidaydayList[0].map((time) => {
+                  return ({
+                    'beginTime': time[0] || '',
+                    'endTime': time[1] || '',
+                    'bookedCount': '0',
+                    'maxBookingCount': time[0]? item.amount : '',
+                  });
+                })
+              ]
+            });
+          })
         );
       }
     });
@@ -388,6 +432,7 @@ const BookingInfo = ()=> {
     return '星期' + week;
   };
 
+  // 点击分页页码的回调
   const handlePageIndexChange = (value) => {
     console.log(value);
     if(value <=1){
@@ -407,6 +452,7 @@ const BookingInfo = ()=> {
         <Button className='btn' type="primary" onClick={showUpdateDrawer}>更新预约设置</Button>
         <Button className='btn' type="primary" onClick={deleteBookingInfo}>删除预约设置</Button>
         <Button className='btn' type="primary" onClick={showAddDrawer}>添加预约设置</Button>
+        <Button className='btn' type="primary" onClick={turnOnOrOffReservation}>开启/关闭预约通道</Button>
       </div>
       <div className='open-info'>
         {
@@ -415,28 +461,28 @@ const BookingInfo = ()=> {
               console.log(index);
               return (
                 <div key={index} className={index%2 !== 0? 'item':'item other'}>
-                  <div className='date'>{Object.keys(item)[0]}</div>
-                  <div className='week'>({getWeek(Object.keys(item)[0])})</div>
+                  <div className='date'>{item[0].day}</div>
+                  <div className='week'>({getWeek(item[0].day)})</div>
                   {
-                    Object.values(item)[0][0].map((item1, index) => {
+                    item.map((place, index) => {
                       return (
                         <div key={index} className='place'>
-                          <div className='placeName'>{item1.placeName+':'}</div>
+                          <div className='placeName'>{place.placeName+':'}</div>
                           {
-                            item1.timeIntervals[0][0].beginTime !== ''? (
+                            place.timeIntervals[0][0].beginTime !== ''? (
                               <div className='am'>
-                                <div className='am-text'>早上: {item1.timeIntervals[0][0].beginTime}-{item1.timeIntervals[0][0].endTime}</div>
-                                <div className='am-bookedCount'>已预定人数: {item1.timeIntervals[0][0].bookedCount}</div>
-                                <div className='am-remaindCount'>剩余预定额: {item1.timeIntervals[0][0].maxBookingCount*1-item1.timeIntervals[0][0].bookedCount*1}</div>
+                                <div className='am-text'>早上: {place.timeIntervals[0][0].beginTime}-{place.timeIntervals[0][0].endTime}</div>
+                                <div className='am-bookedCount'>已预定人数: {place.timeIntervals[0][0].bookedCount}</div>
+                                <div className='am-remaindCount'>剩余预定额: {place.timeIntervals[0][0].maxBookingCount*1-place.timeIntervals[0][0].bookedCount*1}</div>
                               </div>
                             ):''
                           }
                           {
-                            item1.timeIntervals[0][1].beginTime !== ''? (
+                            place.timeIntervals[0][1].beginTime !== ''? (
                               <div className='pm'>
-                                <div className='pm-text'>下午: {item1.timeIntervals[0][1].beginTime}-{item1.timeIntervals[0][1].endTime}</div>
-                                <div className='pm-bookedCount'>已预定人数: {item1.timeIntervals[0][1].bookedCount}</div>
-                                <div className='pm-remaindCount'>剩余预定额: {item1.timeIntervals[0][1].maxBookingCount*1-item1.timeIntervals[0][1].bookedCount*1}</div>
+                                <div className='pm-text'>下午: {place.timeIntervals[0][1].beginTime}-{place.timeIntervals[0][1].endTime}</div>
+                                <div className='pm-bookedCount'>已预定人数: {place.timeIntervals[0][1].bookedCount}</div>
+                                <div className='pm-remaindCount'>剩余预定额: {place.timeIntervals[0][1].maxBookingCount*1-place.timeIntervals[0][1].bookedCount*1}</div>
                               </div>
                             ):''
                           }
@@ -450,7 +496,11 @@ const BookingInfo = ()=> {
           ) : ''
         }
       </div>
-      <Pagination showQuickJumper defaultCurrent={1} defaultPageSize={7} total={initBookingInfo.length>0? initBookingInfo[0].open_info.length:7} onChange={handlePageIndexChange} />
+      {
+        initBookingInfo.length>0 ? (
+          <Pagination showQuickJumper defaultCurrent={1} defaultPageSize={7} total={initBookingInfo.length>0? initBookingInfo[0].open_info.length:7} onChange={handlePageIndexChange} />
+        ):''
+      }
 
       <Drawer width='600' title="预约设置" placement="right" onClose={onClose} visible={visible}>
         <Tabs defaultActiveKey="1">

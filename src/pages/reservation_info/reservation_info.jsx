@@ -10,8 +10,17 @@ import {
   message
 } from 'antd';
 
+import storageUtils from '../../utils/storageUtils';
 import LinkButton from '../../components/link-button';
-import { reqReservationInfo, reqDeleteReservationInfo, reqSearchReservationInfo } from '../../api';
+import ShowImageOrContent from '../../utils/show-image-or-content';
+import { 
+  reqReservationInfo, 
+  reqDeleteReservationInfo, 
+  reqSearchReservationInfo,
+  reqBookingInfoBySchoolId, 
+  reqUpdateOpenInfoInfoBySchoolId,
+  reqSchoolByName
+} from '../../api';
 import {PAGE_SIZE} from '../../utils/constants';
 
 const Option = Select.Option;
@@ -27,21 +36,57 @@ export default class reservation_info extends Component {
     loading: false, // 是否正在加载中
     keyword: '', // 搜索的关键字
     searchType: 'reservation_info_School', // 根据哪个字段搜索
+    isShowImageOrContent: false, // 是否显示内容详情
+    current_click_item:[], // 当前点击查看的一项
   };
 
   componentDidMount () {
     this.getReservationInfo(1);
   }
 
+  // 获取当前登录的学校管理员所在学校的schoolId
+  getSchoolInfoByUsername = async () => {
+    const schoolName =  storageUtils.getAdmin().school[1];
+    const result = await reqSchoolByName(schoolName);
+    console.log(result);
+    return result.data[0]._id;
+  }
+
   /* 删除预约信息 */
-  deleteReservationInfo = (reservation_info) => {
-    console.log(reservation_info);
+  deleteReservationInfo = async (reservation_info) => {
+    console.log('reservation_info', reservation_info);
+    const { res_school_id, res_date, res_place, res_time } = reservation_info || {};
+    // 得到原本的 open_info，修改已预定数量后，在根据 school_id 更新
+    const school_id = res_school_id;
+    const booking_info = await reqBookingInfoBySchoolId(school_id); 
+    const { open_info } = booking_info.data[0] || {}; 
+    
     Modal.confirm({
       title: '确认删除此条预约信息吗吗?',
       onOk: async () => {
         const result = await reqDeleteReservationInfo(reservation_info._id);
         if(result.status===0) {
           message.success('删除预约信息成功!');
+          // 对应的场馆已预订数量要减1
+          open_info.map((item) => {
+            item.map((item1) => {
+              if(item1.day === res_date && item1.placeName === res_place) {
+                item1.timeIntervals.map((item2) => {
+                  item2.map((item3) => {
+                    if(item3.beginTime === res_time.split('-')[0] && item3.endTime === res_time.split('-')[1]){
+                      item3.bookedCount = (item3.bookedCount*1-1).toString();
+                    }
+                  });
+                });
+              }
+            });
+          });
+          const newOpenInfo = open_info;
+          // 更新 open_info
+          const updatedBookingInfo = await reqUpdateOpenInfoInfoBySchoolId({newOpenInfo ,school_id}); 
+          console.log('updatedBookingInfo', updatedBookingInfo);
+          
+          // 重新获取预定信息
           this.getReservationInfo(1);
         }
       }
@@ -60,53 +105,58 @@ export default class reservation_info extends Component {
       },
       {
         title: '手机号',
-        width: 70,
+        width: 80,
         dataIndex: 'res_username',
+      },
+      {
+        title: '头像',
+        width: 80,
+        dataIndex: 'res_avater',
+        render: (text, record, index) => {
+          return (
+            <LinkButton onClick={ ()=>this.ShowImageOrContent(text, record, index) }>点击查看</LinkButton>
+          );
+        }
+      },
+      {
+        title: '已约学校名称',
+        width: 150,
+        dataIndex: 'res_school_name',
+      },
+      // {
+      //   title: '已约学校编号',
+      //   width: 100,
+      //   dataIndex: 'res_school_id',
+      // },
+      {
+        title: '已约日期',
+        width: 100,
+        dataIndex: 'res_date',
+      },
+      {
+        title: '已约场地',
+        width: 90,
+        dataIndex: 'res_place',
+      },
+      {
+        title: '已约时段',
+        width: 100,
+        dataIndex: 'res_time',
+      },
+      {
+        title: '交通方式',
+        width: 80,
+        dataIndex: 'vehicle',
+      },
+      {
+        title: '预约状态',
+        width: 60,
+        dataIndex: 'status',
       },
       {
         title: '提交时间',
         width: 100,
         dataIndex: 'submit_time',
-      },
-      {
-        title: '已约学校',
-        width: 150,
-        dataIndex: 'res_school',
-      },
-      {
-        title: '已约场地',
-        width: 100,
-        dataIndex: 'res_area',
-      },
-      {
-        title: '已约时间',
-        width: 100,
-        dataIndex: 'res_time',
-      },
-      {
-        title: '是否有同行人',
-        width: 60,
-        dataIndex: 'has_partners',
-      },
-      {
-        title: '同行人关系',
-        width: 100,
-        dataIndex: 'partnerts_relation',
-      },
-      {
-        title: '交通方式',
-        width: 100,
-        dataIndex: 'vehicle',
-      },
-      {
-        title: '是否同意安全承诺',
-        width: 60,
-        dataIndex: 'has_agreed_safety_commitment',
-      },
-      {
-        title: '是否同意防疫承诺',
-        width: 60,
-        dataIndex: 'has_agreed_antiepidemic_commitment',
       },
       {
         title: '操作',
@@ -128,6 +178,7 @@ export default class reservation_info extends Component {
     获取指定页码的列表数据显示
   */
   getReservationInfo = async (pageNum) => {
+    const school_id = await this.getSchoolInfoByUsername();
     this.pageNum = pageNum; // 保存pageNum, 让其它方法可以看到
     this.setState({loading: true}); // 显示loading
 
@@ -137,9 +188,10 @@ export default class reservation_info extends Component {
     // 如果搜索关键字有值, 说明我们要做搜索分页
     let result;
     if (keyword) {
-      result = await reqSearchReservationInfo({pageNum, pageSize: PAGE_SIZE, keyword, searchType});
+      result = await reqSearchReservationInfo({pageNum, pageSize: PAGE_SIZE, keyword, searchType, school_id});
     } else { // 一般分页请求
-      result = await reqReservationInfo(pageNum, PAGE_SIZE);
+      result = await reqReservationInfo(pageNum, PAGE_SIZE, school_id);
+      console.log('reqReservationInfo', result);
     }
 
     this.setState({loading: false}); // 隐藏loading
@@ -154,6 +206,23 @@ export default class reservation_info extends Component {
     }
   }
 
+  /* 显示内容详情 */
+  ShowImageOrContent = (text, record) => {
+    console.log(text);
+    this.setState({
+      current_click_item: text,
+      contentDetail: record,
+      isShowImageOrContent: true
+    });
+  }
+
+  /* 用于接收子组件返回的isShowImageOrContent状态 */
+  handleCloseShowImageOrContentModal = (isShowImageOrContent) => {
+    this.setState({
+      isShowImageOrContent
+    });
+  }
+
   render() {
     this.initColumns();
 
@@ -163,7 +232,9 @@ export default class reservation_info extends Component {
       total,
       loading,
       searchType,
-      keyword 
+      keyword,
+      isShowImageOrContent, 
+      current_click_item
     } = this.state;
 
     const title = (
@@ -185,10 +256,10 @@ export default class reservation_info extends Component {
         <Button type='primary' onClick={() => this.getReservationInfo(1)}>搜索</Button>
       </span>
     );
-  
+
     const extra = (
       <Button type='primary' onClick={() => this.props.history.push('/reservation_info/add')}>
-        添加预约信息
+    添加预约信息
       </Button>
     );
 
@@ -207,6 +278,11 @@ export default class reservation_info extends Component {
             showQuickJumper: true,
             onChange: this.getReservationInfo
           }}
+        />
+        <ShowImageOrContent 
+          current_click_item={current_click_item}
+          handleCloseShowImageOrContentModal={this.handleCloseShowImageOrContentModal} 
+          isShowImageOrContent={isShowImageOrContent}
         />
       </Card>
     );
