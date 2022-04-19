@@ -152,6 +152,9 @@ class LeftNav extends Component {
     if(currentPath.indexOf('/user')===0) { 
       currentPath = '/user';
     }
+    if(currentPath.indexOf('/message')===0) { 
+      currentPath = '/message';
+    }
     if(currentPath.indexOf('/admin/school_admin')===0) { 
       currentPath = '/admin/school_admin';
     }

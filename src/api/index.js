@@ -298,6 +298,33 @@ export const reqUpdateUser = ({userObj, userId}) => ajax(BASE + '/manage/user/up
 //#endregion
 
 /**
+ * 用户消息相关
+ */
+//#region 
+// 添加用户消息
+export const reqAddMessage = (messageObj) => ajax(BASE + '/manage/message/add', messageObj, 'POST');
+
+// 删除用户消息
+export const reqDeleteMessage = (messageId) => ajax(BASE + '/manage/message/delete', {messageId}, 'POST');
+
+// 获取新闻列表
+export const reqMessage = (pageNum, pageSize) => ajax(BASE + '/manage/message/list', {pageNum, pageSize});
+
+// 通过发布人获取用户消息列表
+export const reqMessageByPublisher = (publisher, pageNum, pageSize) => ajax(BASE + '/manage/message/search_by_publisher_pageFilter', {publisher, pageNum, pageSize});
+
+// 查询用户消息列表
+export const reqSearchMessage = ({pageNum, pageSize, keyword, searchType}) => ajax(BASE + '/manage/message/search', {
+  pageNum,
+  pageSize,
+  [searchType]: keyword,
+});
+
+// 更新用户消息信息
+export const reqUpdateMessage = ({newMessageObj, messageId}) => ajax(BASE + '/manage/message/update', {newMessageObj, messageId}, 'POST');
+//#endregion
+
+/**
  * 学校管理员相关
  */
 //#region 

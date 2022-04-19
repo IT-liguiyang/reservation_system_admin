@@ -10,6 +10,7 @@ import {
   UserOutlined,
   TeamOutlined,
   UserSwitchOutlined,
+  CommentOutlined,
   FileUnknownOutlined,
   CalendarOutlined
 } from '@ant-design/icons';
@@ -60,6 +61,11 @@ const menuList = [
     title: '用户管理',
     key: '/user',
     icon: <UserOutlined />
+  },
+  {
+    title: '用户消息管理',
+    key: '/message',
+    icon: <CommentOutlined />
   },
   {
     title: '管理员管理',

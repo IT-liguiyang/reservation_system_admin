@@ -16,6 +16,7 @@ import ReservationInfo from '../reservation_info';
 import SchoolAdmin from '../school_admin';
 import SystemAdmin from '../system_admin';
 import User from '../user';
+import Message from '../message';
 import SchoolAdminRole from '../role/school_admin';
 import SystemAdminRole from '../role/system_admin';
 import BookingInfo from '../booking_info';
@@ -56,6 +57,7 @@ export default class Home extends Component {
               <Route path='/admin/school_admin' component={SchoolAdmin}/>
               <Route path='/admin/system_admin' component={SystemAdmin}/>
               <Route path='/user' component={User}/>
+              <Route path='/message' component={Message}/>
               <Route path='/role/school_admin' component={SchoolAdminRole}/>
               <Route path='/role/system_admin' component={SystemAdminRole}/>
               <Route path='/booking_info' component={BookingInfo}/>
