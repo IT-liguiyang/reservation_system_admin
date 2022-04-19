@@ -12,8 +12,9 @@ import {
 
 import ShowPublishContent from '../../utils/show-publish-content';
 import LinkButton from '../../components/link-button';
-import { reqNews, reqDeleteNews, reqSearchNews } from '../../api';
+import { reqNews, reqDeleteNews, reqSearchNews, reqNewsByPublisher } from '../../api';
 import {PAGE_SIZE} from '../../utils/constants';
+import storageUtils from '../../utils/storageUtils';
 
 const Option = Select.Option;
 
@@ -23,6 +24,7 @@ News的默认子路由组件
 export default class News extends Component {
 
   state = {
+    adminInfo: {}, // 保存管理员信息，用于判断是学校管理员还是系统管理员
     total: 0, // 公告的总数量
     news: [], // 公告的数组
     loading: false, // 是否正在加载中
@@ -34,7 +36,24 @@ export default class News extends Component {
   };
 
   componentDidMount () {
-    this.getNews(1);
+    // 使用 promise 可以使得先得到 adminInfo 在进行查询学校信息
+    this.getLoginAdminInfo().then(() => {
+      this.getNews(1);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+
+  // 保存当前登录管理员信息
+  getLoginAdminInfo = () => {
+    return new Promise((resolve) => {
+      const adminInfo = storageUtils.getAdmin();
+      console.log('adminInfo', adminInfo);
+      this.setState({
+        adminInfo: adminInfo
+      });
+      resolve(adminInfo);
+    });
   }
 
   /* 显示公告内容详情 */
@@ -138,7 +157,13 @@ export default class News extends Component {
     if (keyword) {
       result = await reqSearchNews({pageNum, pageSize: PAGE_SIZE, keyword, searchType});
     } else { // 一般分页请求
-      result = await reqNews(pageNum, PAGE_SIZE);
+      if(this.state.adminInfo.role_id === '2'){
+        // 如果为学校管理员，则只显示所在学校的公告
+        const schoolName = this.state.adminInfo.school[1];
+        result = await reqNewsByPublisher(schoolName, pageNum, PAGE_SIZE);
+      } else {
+        result = await reqNews(pageNum, PAGE_SIZE);
+      }
     }
 
     this.setState({loading: false}); // 隐藏loading
@@ -170,14 +195,26 @@ export default class News extends Component {
 
     const title = (
       <span>
-        <Select
-          value= {searchType}
-          style={{width: 150}}
-          onChange={value => this.setState({searchType:value})}
-        >
-          <Option value='newsTheme'>按标题搜索</Option>
-          <Option value='newsPublisher'>按发布人搜索</Option>
-        </Select>
+        {
+          // 若为学校管理员则只有按主题搜索
+          this.state.adminInfo.role_id === '2'? (
+            <Select
+              value= {searchType}
+              style={{width: 150}}
+              onChange={value => this.setState({searchType:value})}
+            >
+              <Option value='newsTheme'>按主题搜索</Option>
+            </Select>):(
+            <Select
+              value= {searchType}
+              style={{width: 150}}
+              onChange={value => this.setState({searchType:value})}
+            >
+              <Option value='newsTheme'>按主题搜索</Option>
+              <Option value='newsPublisher'>按发布人搜索</Option>
+            </Select>
+          )
+        }
         <Input
           placeholder='关键字'
           style={{width: 150, margin: '0 15px'}}

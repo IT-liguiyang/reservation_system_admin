@@ -13,8 +13,9 @@ import {
 import ShowPublishContent from '../../utils/show-publish-content';
 import ShowImageOrContent from '../../utils/show-image-or-content';
 import LinkButton from '../../components/link-button';
-import { reqFeedback, reqDeleteFeedback, reqSearchFeedback } from '../../api';
+import { reqFeedback, reqDeleteFeedback, reqSearchFeedback, reqFeedbackByAcceptor } from '../../api';
 import {PAGE_SIZE} from '../../utils/constants';
+import storageUtils from '../../utils/storageUtils';
 
 const Option = Select.Option;
 
@@ -24,6 +25,7 @@ Feedback的默认子路由组件
 export default class Feedback extends Component {
 
   state = {
+    adminInfo: {}, // 保存管理员信息，用于判断是学校管理员还是系统管理员
     total: 0, // 意见建议的总数量
     feedback: [], // 意见建议的数组
     loading: false, // 是否正在加载中
@@ -37,7 +39,24 @@ export default class Feedback extends Component {
   };
 
   componentDidMount () {
-    this.getFeedback(1);
+    // 使用 promise 可以使得先得到 adminInfo 在进行查询学校信息
+    this.getLoginAdminInfo().then(() => {
+      this.getFeedback(1);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+
+  // 保存当前登录管理员信息
+  getLoginAdminInfo = () => {
+    return new Promise((resolve) => {
+      const adminInfo = storageUtils.getAdmin();
+      console.log('adminInfo', adminInfo);
+      this.setState({
+        adminInfo: adminInfo
+      });
+      resolve(adminInfo);
+    });
   }
 
   /* 显示意见建议内容详情 */
@@ -167,7 +186,13 @@ export default class Feedback extends Component {
     if (keyword) {
       result = await reqSearchFeedback({pageNum, pageSize: PAGE_SIZE, keyword, searchType});
     } else { // 一般分页请求
-      result = await reqFeedback(pageNum, PAGE_SIZE);
+      if(this.state.adminInfo.role_id === '2'){
+        // 如果为学校管理员，则只显示所在学校的公告
+        const acceptor = this.state.adminInfo.school[1];
+        result = await reqFeedbackByAcceptor(acceptor, pageNum, PAGE_SIZE);
+      } else {
+        result = await reqFeedback(pageNum, PAGE_SIZE);
+      }
     }
 
     this.setState({loading: false}); // 隐藏loading
@@ -201,14 +226,26 @@ export default class Feedback extends Component {
 
     const title = (
       <span>
-        <Select
-          value= {searchType}
-          style={{width: 150}}
-          onChange={value => this.setState({searchType:value})}
-        >
-          <Option value='feedbackTheme'>按主题搜索</Option>
-          <Option value='feedbackPublisher'>按发布人搜索</Option>
-        </Select>
+        {
+          // 若为学校管理员则只有按发布人搜索
+          this.state.adminInfo.role_id === '2'? (
+            <Select
+              value= {searchType}
+              style={{width: 150}}
+              onChange={value => this.setState({searchType:value})}
+            >
+              <Option value='feedbackPublisher'>按发布人搜索</Option>
+            </Select>):(
+            <Select
+              value= {searchType}
+              style={{width: 150}}
+              onChange={value => this.setState({searchType:value})}
+            >
+              <Option value='feedbackPublisher'>按发布人搜索</Option>
+              <Option value='feedbackAcceptor'>按受理人搜索</Option>
+            </Select>
+          )
+        }
         <Input
           placeholder='关键字'
           style={{width: 150, margin: '0 15px'}}

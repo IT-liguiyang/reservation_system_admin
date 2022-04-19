@@ -12,8 +12,9 @@ import {
 
 import LinkButton from '../../components/link-button';
 import ShowImageOrContent from '../../utils/show-image-or-content';
-import { reqSchools, reqSearchSchools, reqDeleteSchool} from '../../api';
+import { reqSchools, reqSearchSchools, reqDeleteSchool, reqSchoolByName} from '../../api';
 import {PAGE_SIZE} from '../../utils/constants';
+import storageUtils from '../../utils/storageUtils';
 
 const Option = Select.Option;
 
@@ -23,6 +24,7 @@ School的默认子路由组件
 export default class School extends Component {
 
   state = {
+    adminInfo: {}, // 保存管理员信息，用于判断是学校管理员还是系统管理员
     total: 0, // 学校的总数量
     schools: [], // 学校的数组
     loading: false, // 是否正在加载中
@@ -33,7 +35,24 @@ export default class School extends Component {
   };
   
   componentDidMount () {
-    this.getSchools(1);
+    // 使用 promise 可以使得先得到 adminInfo 在进行查询学校信息
+    this.getLoginAdminInfo().then(() => {
+      this.getSchools(1);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+
+  // 保存当前登录管理员信息
+  getLoginAdminInfo = () => {
+    return new Promise((resolve) => {
+      const adminInfo = storageUtils.getAdmin();
+      console.log('adminInfo', adminInfo);
+      this.setState({
+        adminInfo: adminInfo
+      });
+      resolve(adminInfo);
+    });
   }
 
   /* 显示开放区域详情 */
@@ -223,6 +242,21 @@ export default class School extends Component {
     获取指定页码的列表数据显示
   */
   getSchools = async (pageNum) => {
+    // 如果为学校管理员，则只显示所在学校的信息，否则为系统管理员显示全部信息
+    console.log('this.state.adminInfo', this.state.adminInfo);
+    if(this.state.adminInfo.role_id === '2') {
+      const schoolName = this.state.adminInfo.school[1];
+      const result = await reqSchoolByName(schoolName);
+      if (result.status === 0) {
+        // 取出分页数据, 更新状态, 显示分页列表
+        // console.log(result.data);
+        this.setState({
+          schools: result.data
+        });
+      }
+      return;
+    }
+
     this.pageNum = pageNum; // 保存pageNum, 让其它方法可以看到
     this.setState({loading: true}); // 显示loading
 
@@ -256,7 +290,7 @@ export default class School extends Component {
     // 取出状态数据
     const { schools, total, loading, searchType, keyword } = this.state;
 
-    const title = (
+    const title = this.state.adminInfo.role_id === '1'? (
       <span>
         <Select
           value= {searchType}
@@ -274,13 +308,13 @@ export default class School extends Component {
         />
         <Button type='primary' onClick={() => this.getSchools(1)}>搜索</Button>
       </span>
-    );
+    ):'';
 
-    const extra = (
+    const extra = this.state.adminInfo.role_id === '1'? (
       <Button type='primary' onClick={() => this.props.history.push('/school/add')}>
         添加学校
       </Button>
-    );
+    ):'';
 
     return (
       <Card title={title} extra={extra}>

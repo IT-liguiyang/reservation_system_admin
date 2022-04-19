@@ -83,8 +83,8 @@ export const reqDeleteAnnouncement = (announcementId) => ajax(BASE + '/manage/an
 // 获取学校列表
 export const reqAnnouncements = (pageNum, pageSize) => ajax(BASE + '/manage/announcement/list', {pageNum, pageSize});
 
-// // 更新分类
-// export const reqUpdateCategory = ({categoryId, categoryName}) => ajax(BASE + '/manage/category/update', {categoryId, categoryName}, 'POST')
+// 通过发布人获取学校列表
+export const reqAnnouncementsByPublisher = (schoolName, pageNum, pageSize) => ajax(BASE + '/manage/announcement/search_by_publisher_pageFilter', {schoolName, pageNum, pageSize});
 
 export const reqSearchAnnouncements = ({pageNum, pageSize, keyword, searchType}) => ajax(BASE + '/manage/announcement/search', {
   pageNum,
@@ -108,6 +108,9 @@ export const reqDeleteNews = (newsId) => ajax(BASE + '/manage/news/delete', {new
 
 // 获取新闻列表
 export const reqNews = (pageNum, pageSize) => ajax(BASE + '/manage/news/list', {pageNum, pageSize});
+
+// 通过发布人获取学校列表
+export const reqNewsByPublisher = (schoolName, pageNum, pageSize) => ajax(BASE + '/manage/news/search_by_publisher_pageFilter', {schoolName, pageNum, pageSize});
 
 // 查询新闻列表
 export const reqSearchNews = ({pageNum, pageSize, keyword, searchType}) => ajax(BASE + '/manage/news/search', {
@@ -155,26 +158,29 @@ export const reqUpdateDynamicSharingComment = ({commentObj, commentId}) => ajax(
 //#endregion
 
 /**
- * 意见建议相关
+ * 意见反馈相关
  */
 //#region 
-// 添加意见建议
+// 添加意见反馈
 export const reqAddFeedback = (feedbackObj) => ajax(BASE + '/manage/feedback/add', feedbackObj, 'POST');
 
-// 删除意见建议
+// 删除意见反馈
 export const reqDeleteFeedback = (feedbackId) => ajax(BASE + '/manage/feedback/delete', {feedbackId}, 'POST');
 
-// 获取意见建议列表
+// 获取意见反馈列表
 export const reqFeedback = (pageNum, pageSize) => ajax(BASE + '/manage/feedback/list', {pageNum, pageSize});
 
-// 查询意见建议列表
+// 通过受理人获取意见反馈列表
+export const reqFeedbackByAcceptor = (acceptor, pageNum, pageSize) => ajax(BASE + '/manage/feedback/search_by_acceptor_pageFilter', {acceptor, pageNum, pageSize});
+
+// 查询意见反馈列表
 export const reqSearchFeedback = ({pageNum, pageSize, keyword, searchType}) => ajax(BASE + '/manage/feedback/search', {
   pageNum,
   pageSize,
   [searchType]: keyword,
 });
 
-// 更新意见建议信息
+// 更新意见反馈信息
 export const reqUpdateFeedback = ({feedbackObj, feedbackId}) => ajax(BASE + '/manage/feedback/update', {feedbackObj, feedbackId}, 'POST');
 //#endregion
 
@@ -242,15 +248,25 @@ export const reqDeleteReservationInfo = (reservation_infoId) => ajax(BASE + '/ma
 // // 获取预约信息列表
 // export const reqReservationInfo = (school_id, pageNum, pageSize) => ajax(BASE + '/manage/reservation_info/list', {school_id, pageNum, pageSize});
 
-// 获取预约信息列表
-export const reqReservationInfo = (pageNum, pageSize, school_id) => ajax(BASE + '/manage/reservation_info/list_by_school_name', {pageNum, pageSize, school_id});
+// 获取预约信息列表 -学校管理员
+export const reqReservationInfoBySchoolId = (pageNum, pageSize, school_id) => ajax(BASE + '/manage/reservation_info/list_by_school_id', {pageNum, pageSize, school_id});
 
-// 查询预约信息列表
-export const reqSearchReservationInfo = ({school_id, pageNum, pageSize, keyword, searchType}) => ajax(BASE + '/manage/reservation_info/search', {
+// 查询预约信息列表 -学校管理员
+export const reqSearchReservationInfoBySchoolId = ({school_id, pageNum, pageSize, keyword, searchType}) => ajax(BASE + '/manage/reservation_info/search_by_school_id', {
   pageNum,
   pageSize,
   [searchType]: keyword,
   school_id
+});
+
+// 获取预约信息列表
+export const reqReservationInfo = (pageNum, pageSize) => ajax(BASE + '/manage/reservation_info/list', {pageNum, pageSize});
+
+// 查询预约信息列表
+export const reqSearchReservationInfo = ({pageNum, pageSize, keyword, searchType}) => ajax(BASE + '/manage/reservation_info/search', {
+  pageNum,
+  pageSize,
+  [searchType]: keyword,
 });
 
 // 更新预约信息

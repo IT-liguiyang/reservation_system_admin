@@ -37,7 +37,7 @@ export default class DynamicSharing extends Component {
     isShowComment: false, // 是否显示评论详情
     commentDetail:{},  // 评论详情
     isShowLove: false, // 是否显示点赞详情
-    LoveDetail:{},  // 点赞详情
+    loveDetail:{},  // 点赞详情
     isShowImageOrContent: false, // 是否显示图片详情
     imageDetail:{},  // 内容详情
     current_click_item:[] // 当前点击查看的一项
@@ -308,26 +308,22 @@ export default class DynamicSharing extends Component {
           current_click_item={current_click_item} 
           handleCloseShowImageOrContentModal={this.handleCloseShowImageOrContentModal} 
           isShowImageOrContent={isShowImageOrContent} 
-
         />
         <ShowPublishContent 
           detailTitle={detailTitle} 
           contentDetail={contentDetail} 
           handleCloseShowPublishContentModal={this.handleCloseShowPublishContentModal} 
           isShowPublishContent={isShowPublishContent} 
-
         />
         <ShowComment 
           commentDetail={commentDetail} 
           handleCloseShowCommentModal={this.handleCloseShowCommentModal} 
           isShowComment={isShowComment} 
-
         />
         <ShowLove 
           loveDetail={loveDetail} 
           handleCloseShowLoveModal={this.handleCloseShowLoveModal} 
           isShowLove={isShowLove} 
-          
         />
       </Card>
     );

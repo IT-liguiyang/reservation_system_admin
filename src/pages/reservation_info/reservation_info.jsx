@@ -14,9 +14,11 @@ import storageUtils from '../../utils/storageUtils';
 import LinkButton from '../../components/link-button';
 import ShowImageOrContent from '../../utils/show-image-or-content';
 import { 
-  reqReservationInfo, 
-  reqDeleteReservationInfo, 
+  reqReservationInfo,
+  reqReservationInfoBySchoolId, 
   reqSearchReservationInfo,
+  reqSearchReservationInfoBySchoolId,
+  reqDeleteReservationInfo, 
   reqBookingInfoBySchoolId, 
   reqUpdateOpenInfoInfoBySchoolId,
   reqSchoolByName
@@ -31,6 +33,7 @@ reservation_info的默认子路由组件
 export default class reservation_info extends Component {
 
   state = {
+    adminInfo: {}, // 保存管理员信息，用于判断是学校管理员还是系统管理员
     total: 0, // 预约信息的总数量
     reservation_info: [], // 预约信息的数组
     loading: false, // 是否正在加载中
@@ -41,16 +44,32 @@ export default class reservation_info extends Component {
   };
 
   componentDidMount () {
-    this.getReservationInfo(1);
+    // 使用 promise 可以使得先得到 adminInfo 在进行查询学校信息
+    this.getLoginAdminInfo().then(() => {
+      this.getReservationInfo(1);
+    }).catch((err) => {
+      console.log(err);
+    });
   }
 
-  // 获取当前登录的学校管理员所在学校的schoolId
-  getSchoolInfoByUsername = async () => {
-    const schoolName =  storageUtils.getAdmin().school[1];
-    const result = await reqSchoolByName(schoolName);
-    console.log(result);
-    return result.data[0]._id;
-  }
+   // 保存当前登录管理员信息
+   getLoginAdminInfo = () => {
+     return new Promise((resolve) => {
+       const adminInfo = storageUtils.getAdmin();
+       console.log('adminInfo', adminInfo);
+       this.setState({
+         adminInfo: adminInfo
+       });
+       resolve(adminInfo);
+     });
+   }
+
+   //  // 获取当前登录的学校管理员所在学校的schoolId
+   //  getSchoolInfoByUsername = async (schoolName) => {
+   //    const result = await reqSchoolByName(schoolName);
+   //    console.log(result);
+   //    return result.data[0]._id;
+   //  }
 
   /* 删除预约信息 */
   deleteReservationInfo = async (reservation_info) => {
@@ -178,7 +197,13 @@ export default class reservation_info extends Component {
     获取指定页码的列表数据显示
   */
   getReservationInfo = async (pageNum) => {
-    const school_id = await this.getSchoolInfoByUsername();
+    var school_id = '';
+    if(this.state.adminInfo.role_id === '2') {
+      const schoolName =  storageUtils.getAdmin().school[1];
+      const result = await reqSchoolByName(schoolName);
+      console.log('result', result);
+      school_id = result.data[0]._id;
+    }
     this.pageNum = pageNum; // 保存pageNum, 让其它方法可以看到
     this.setState({loading: true}); // 显示loading
 
@@ -188,10 +213,19 @@ export default class reservation_info extends Component {
     // 如果搜索关键字有值, 说明我们要做搜索分页
     let result;
     if (keyword) {
-      result = await reqSearchReservationInfo({pageNum, pageSize: PAGE_SIZE, keyword, searchType, school_id});
+      if(this.state.adminInfo.role_id === '2') {
+        console.log('school_id', school_id);
+        result = await reqSearchReservationInfoBySchoolId({pageNum, pageSize: PAGE_SIZE, keyword, searchType, school_id});
+      } else {
+        result = await reqSearchReservationInfo({pageNum, pageSize: PAGE_SIZE, keyword, searchType});
+      }
     } else { // 一般分页请求
-      result = await reqReservationInfo(pageNum, PAGE_SIZE, school_id);
-      console.log('reqReservationInfo', result);
+      if(this.state.adminInfo.role_id === '2') {
+        console.log('school_id', school_id);
+        result = await reqReservationInfoBySchoolId(pageNum, PAGE_SIZE, school_id);
+      } else {
+        result = await reqReservationInfo(pageNum, PAGE_SIZE);
+      }
     }
 
     this.setState({loading: false}); // 隐藏loading
@@ -239,14 +273,26 @@ export default class reservation_info extends Component {
 
     const title = (
       <span>
-        <Select
-          value= {searchType}
-          style={{width: 150}}
-          onChange={value => this.setState({searchType:value})}
-        >
-          <Option value='reservation_info_School'>按已约学校搜索</Option>
-          <Option value='reservation_info_Name'>按预约姓名搜索</Option>
-        </Select>
+        {
+          // 若为学校管理员则只有按标题搜索
+          this.state.adminInfo.role_id === '2'? (
+            <Select
+              value= {searchType}
+              style={{width: 150}}
+              onChange={value => this.setState({searchType:value})}
+            >
+              <Option value='reservation_info_School'>按已约学校搜索</Option>
+            </Select>):(
+            <Select
+              value= {searchType}
+              style={{width: 150}}
+              onChange={value => this.setState({searchType:value})}
+            >
+              <Option value='reservation_info_School'>按已约学校搜索</Option>
+              <Option value='reservation_info_Name'>按预约姓名搜索</Option>
+            </Select>
+          )
+        }
         <Input
           placeholder='关键字'
           style={{width: 150, margin: '0 15px'}}
