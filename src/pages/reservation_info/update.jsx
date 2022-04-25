@@ -12,9 +12,12 @@ import {
 import moment from 'moment';
 import LinkButton from '../../components/link-button';
 import { reqUpdateReservationInfo } from '../../api';
+import PicturesWall from '../../utils/pictures-wall';
 
 // 添加预约信息组件
 const ReservationInfoUpdate = (props) => {
+
+  const image = React.createRef();  // 得到头像上传对象
 
   // 头部左侧标题
   const title = (
@@ -39,29 +42,29 @@ const ReservationInfoUpdate = (props) => {
     const { 
       res_realname, 
       res_username, 
-      res_school, 
-      res_area, 
-      res_time, 
-      has_partners, 
-      partnerts_relation, 
-      vehicle, 
-      has_agreed_safety_commitment,
-      has_agreed_antiepidemic_commitment 
+      res_school_name, 
+      res_school_id, 
+      res_date, 
+      res_place, 
+      res_time,
+      vehicle,
+      status, 
     } = values;
  
     // 3. 生成预约信息对象
     const reservation_infoObj = {
       res_realname,
       res_username, 
+      res_avater: image.current? image.current.getImgs():{}, 
+      res_school_name, 
+      res_school_id, 
+      res_date, 
+      res_place, 
+      res_time,
+      vehicle,
+      status, 
       submit_time,
-      res_school, 
-      res_area, 
-      res_time, 
-      has_partners, 
-      partnerts_relation, 
-      vehicle, 
-      has_agreed_safety_commitment, 
-      has_agreed_antiepidemic_commitment
+      comment: [],
     };
  
     console.log(reservation_infoObj);
@@ -97,14 +100,14 @@ const ReservationInfoUpdate = (props) => {
   const {  // 对象的省略写法 res_realname: res_realname, 写成 res_realname
     res_realname, 
     res_username, 
-    res_school, 
-    res_area, 
-    res_time, 
-    has_partners, 
-    partnerts_relation, 
-    vehicle, 
-    has_agreed_safety_commitment,
-    has_agreed_antiepidemic_commitment  
+    res_avater, 
+    res_school_name, 
+    res_school_id, 
+    res_date, 
+    res_place, 
+    res_time,
+    vehicle,
+    status,   
   } = reservation_infoObj || {};
 
   return (
@@ -115,14 +118,14 @@ const ReservationInfoUpdate = (props) => {
         initialValues={{  // 为表单类input输入框设置初始默认值，对象的省略写法
           res_realname, 
           res_username, 
-          res_school, 
-          res_area, 
-          res_time, 
-          has_partners, 
-          partnerts_relation, 
-          vehicle, 
-          has_agreed_safety_commitment,
-          has_agreed_antiepidemic_commitment  
+          res_avater, 
+          res_school_name, 
+          res_school_id, 
+          res_date, 
+          res_place, 
+          res_time,
+          vehicle,
+          status, 
         }}
       >
         <Form.Item
@@ -155,21 +158,19 @@ const ReservationInfoUpdate = (props) => {
         >
           <Input placeholder='请输入手机号' />
         </Form.Item>
-        {/* <Form.Item
-          name="submit_time"
-          label="提交时间"
+        <Form.Item 
+          label="头像"
           rules={[
             {
               required: true,
-              message: '请输入提交时间!',
-              whitespace: true,
+              message: '请上传图片!',
             },
           ]}
         >
-          <Input placeholder='请输入提交时间' />
-        </Form.Item> */}
+          <PicturesWall ref={image} imgs={res_avater}/>
+        </Form.Item>
         <Form.Item
-          name="res_school"
+          name="res_school_name"
           label="已约学校"
           rules={[
             {
@@ -182,56 +183,56 @@ const ReservationInfoUpdate = (props) => {
           <Input placeholder='请输入已约学校' />
         </Form.Item>
         <Form.Item
-          name="res_area"
-          label="已约场地"
+          name="res_school_id"
+          label="学校编号"
           rules={[
             {
               required: true,
-              message: '请输入已约场地!',
+              message: '请输入已约学校编号!',
               whitespace: true,
             },
           ]}
         >
-          <Input placeholder='请输入已约场地' />
+          <Input placeholder='请输入已约学校编号' />
+        </Form.Item>
+        <Form.Item
+          name="res_date"
+          label="已约日期"
+          rules={[
+            {
+              required: true,
+              message: '请输入已约日期!',
+              whitespace: true,
+            },
+          ]}
+        >
+          <Input placeholder='请输入已约日期（如 2022-01-01 ）' />
+        </Form.Item>
+        <Form.Item
+          name="res_place"
+          label="已约场馆"
+          rules={[
+            {
+              required: true,
+              message: '请输入已约场馆!',
+              whitespace: true,
+            },
+          ]}
+        >
+          <Input placeholder='请输入已约场馆' />
         </Form.Item>
         <Form.Item
           name="res_time"
-          label="已约时间"
+          label="已约时段"
           rules={[
             {
               required: true,
-              message: '请输入已约时间!',
+              message: '请输入已约时段!',
               whitespace: true,
             },
           ]}
         >
-          <Input placeholder='请输入已约时间' />
-        </Form.Item>
-        <Form.Item
-          name="has_partners"
-          label="同行人"
-          rules={[
-            {
-              required: true,
-              message: '请输入是否有同行人!',
-              whitespace: true,
-            },
-          ]}
-        >
-          <Input placeholder='请输入是否有同行人' />
-        </Form.Item>
-        <Form.Item
-          name="partnerts_relation"
-          label="同行人关系"
-          // rules={[
-          //   {
-          //     required: true,
-          //     message: '请输入同行人关系!',
-          //     whitespace: true,
-          //   },
-          // ]}
-        >
-          <Input placeholder='请输入同行人关系' />
+          <Input placeholder='请输入已约时段' />
         </Form.Item>
         <Form.Item
           name="vehicle"
@@ -247,30 +248,17 @@ const ReservationInfoUpdate = (props) => {
           <Input placeholder='请输入交通方式' />
         </Form.Item>
         <Form.Item
-          name="has_agreed_safety_commitment"
-          label="安全承诺"
+          name="status"
+          label="预约状态"
           rules={[
             {
               required: true,
-              message: '请输入是否同意安全承诺!',
+              message: '请输入预约状态!',
               whitespace: true,
             },
           ]}
         >
-          <Input placeholder='请输入是否同意安全承诺' />
-        </Form.Item>
-        <Form.Item
-          name="has_agreed_antiepidemic_commitment"
-          label="防疫承诺"
-          rules={[
-            {
-              required: true,
-              message: '请输入是否同意防疫承诺!',
-              whitespace: true,
-            },
-          ]}
-        >
-          <Input placeholder='请输入是否同意防疫承诺' />
+          <Input placeholder='请输入预约状态' />
         </Form.Item>
         <Form.Item>
           <Button type='primary' style={{marginLeft:70+'px'}} htmlType="submit">提交</Button>
