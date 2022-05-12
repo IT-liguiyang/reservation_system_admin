@@ -245,8 +245,8 @@ export const reqAddReservationInfo = (reservation_infoObj) => ajax(BASE + '/mana
 // 删除预约信息
 export const reqDeleteReservationInfo = (reservation_infoId) => ajax(BASE + '/manage/reservation_info/delete', {reservation_infoId}, 'POST');
 
-// // 获取预约信息列表
-// export const reqReservationInfo = (school_id, pageNum, pageSize) => ajax(BASE + '/manage/reservation_info/list', {school_id, pageNum, pageSize});
+// 获取预约信息列表
+export const reqReservationInfoBySchoolName = (school_name) => ajax(BASE + '/manage/reservation_info/list_by_school_name', {school_name});
 
 // 获取预约信息列表 -学校管理员
 export const reqReservationInfoBySchoolId = (pageNum, pageSize, school_id) => ajax(BASE + '/manage/reservation_info/list_by_school_id', {pageNum, pageSize, school_id});
@@ -285,6 +285,9 @@ export const reqDeleteUser = (userId) => ajax(BASE + '/manage/user/delete', {use
 
 // 获取用户列表
 export const reqUser = (pageNum, pageSize) => ajax(BASE + '/manage/user/list', {pageNum, pageSize});
+
+// 获取用户列表
+export const reqUserList = () => ajax(BASE + '/manage/user/all_list');
 
 // 查询用户列表
 export const reqSearchUser = ({pageNum, pageSize, keyword, searchType}) => ajax(BASE + '/manage/user/search', {
